@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function Navbar() {
   const { session } = useAuth();

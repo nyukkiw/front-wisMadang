@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function Sidebar() {
   const { session, logout } = useAuth();

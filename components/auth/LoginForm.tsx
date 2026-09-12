@@ -4,75 +4,106 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth, Role } from "@/context/AuthContext";
+
+import { dummyUsers } from "@/data/dummyData";
+import { useAuth } from "./AuthProvider";
 
 export default function LoginForm() {
   const router = useRouter();
+
   const { login } = useAuth();
 
-  const [nama, setNama] = useState("");
-  const [peran, setPeran] = useState<Role>("pelanggan");
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const [rememberMe, setRememberMe] = useState(false);
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!nama.trim()) {
-      alert("Nama harus diisi");
+    setError("");
+    setLoading(true);
+
+    // Simulasi proses login
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    const user = dummyUsers.find((item) => item.email === identifier && item.password === password);
+
+    if (!user) {
+      setError("Username/email atau password yang Anda masukkan salah.");
+
+      setLoading(false);
       return;
     }
 
-    login(nama, peran);
+    const session = {
+      token: `dummy-token-${user.id}-${Date.now()}`,
+      nama: user.name,
+      peran: user.role as "admin" | "kasir" | "pelanggan",
+    };
 
-    if (peran === "pelanggan") {
-      router.push("/pelanggan");
-    } else {
+    login(session);
+
+    setLoading(false);
+
+    // Redirect berdasarkan role
+    if (user.role === "admin" || user.role === "kasir") {
       router.push("/admin");
+    } else {
+      router.push("/pelanggan");
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
-        {/* Logo / Brand */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-green-700">Wis Madang</h1>
+    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5">
+      <div>
+        <label htmlFor="identifier" className="mb-2 block text-sm font-medium">
+          Email
+        </label>
 
-          <p className="mt-2 text-sm text-gray-500">Silakan masuk untuk melanjutkan</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Nama */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Nama</label>
-
-            <input
-              type="text"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              placeholder="Masukkan nama"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
-            />
-          </div>
-
-          {/* Role */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Masuk sebagai</label>
-
-            <select value={peran} onChange={(e) => setPeran(e.target.value as Role)} className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100">
-              <option value="pelanggan">Pelanggan</option>
-              <option value="kasir">Kasir</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-
-          {/* Button */}
-          <button type="submit" className="w-full rounded-lg bg-green-600 py-3 font-semibold text-white transition hover:bg-green-700 active:scale-[0.99]">
-            Masuk
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-xs text-gray-400">Demo autentikasi — belum menggunakan backend</p>
+        <input
+          id="identifier"
+          type="text"
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
+          placeholder="Masukkan email"
+          required
+          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-600 outline-none focus:ring-2 focus:ring-teal-700"
+        />
       </div>
-    </div>
+
+      <div>
+        <label htmlFor="password" className="mb-2 block text-sm font-medium">
+          Password
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Masukkan password"
+          required
+          className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 placeholder:text-gray-600 outline-none focus:ring-2 focus:ring-teal-700"
+        />
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input id="remember" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="h-4 w-4" />
+
+        <label htmlFor="remember" className="text-sm text-gray-600">
+          Ingat saya
+        </label>
+      </div>
+
+      {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>}
+
+      <button type="submit" disabled={loading} className="w-full rounded-xl bg-[#E9785F] px-4 py-3 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60">
+        {loading ? "Memproses..." : "Masuk"}
+      </button>
+    </form>
   );
 }

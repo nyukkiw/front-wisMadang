@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "../contexts/AuthContext";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   // Metadata untuk halaman ini, bisa diubah (bisa diubah seperlunya)
   title: "Wis Madang",
-  description: "Sistem Wis Madang",
+  description: "Platform Digital Cafe & Catering",
 };
 
 // export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 //   );
 // }
 
-export default function RootLayout({ // Fungsi RootLayout untuk membungkus seluruh halaman dengan AuthProvider agar context autentikasi dapat diakses di seluruh halaman
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
