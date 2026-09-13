@@ -1,6 +1,7 @@
 // File untuk menyimpan data dummy sebelum ada data aseli
 
 export const dummyUsers = [
+  // Mock data user
   {
     id: 1,
     name: "Budi",
@@ -25,65 +26,126 @@ export const dummyUsers = [
 ];
 
 export const dummyCategories = [
+  // Mock data kategori
   {
-    id: 1,
-    name: "Makanan",
+    id: "semua",
+    name: "Semua",
   },
   {
-    id: 2,
+    id: "nasi",
+    name: "Nasi",
+  },
+  {
+    id: "lauk",
+    name: "Lauk",
+  },
+  {
+    id: "sayur",
+    name: "Sayur",
+  },
+  {
+    id: "minuman",
     name: "Minuman",
-  },
-  {
-    id: 3,
-    name: "Snack",
   },
 ];
 
 export const dummyMenus = [
+  // Mock data menu
   {
     id: 1,
     name: "Nasi Goreng",
-    category_id: 1,
+    category: "nasi",
     price: 15000,
-    stock: 20,
+    rating: 4.5,
+    review_count: 120,
+    available: true,
+    apakah_laris: true,
     image: "IMG Wis Madang//Nasi Goreng.jpg",
     description: "Nasi goreng dengan telur dan sayuran.",
   },
   {
     id: 2,
     name: "Nasi Putih",
-    category_id: 1,
+    category: "nasi",
     price: 13000,
-    stock: 15,
+    rating: 4.2,
+    review_count: 95,
+    available: true,
+    apakah_laris: false,
     image: "IMG Wis Madang//Nasi Putih.jpg",
     description: "Nasi putih biasa.",
   },
   {
     id: 3,
     name: "Es Teh",
-    category_id: 2,
+    category: "minuman",
     price: 5000,
-    stock: 30,
+    rating: 4.0,
+    review_count: 80,
+    available: true,
+    apakah_laris: false,
     image: "IMG Wis Madang//Es Teh.jpg",
     description: "Es teh manis segar.",
   },
   {
     id: 4,
     name: "Kopi Hitam",
-    category_id: 2,
+    category: "minuman",
     price: 10000,
-    stock: 25,
+    rating: 4.3,
+    review_count: 110,
+    available: true,
+    apakah_laris: true,
     image: "IMG Wis Madang//Kopi Hitam.jpg",
     description: "Kopi hitam dengan rasa kuat.",
   },
   {
     id: 5,
     name: "Tahu Goreng",
-    category_id: 3,
+    category: "lauk",
     price: 8000,
-    stock: 10,
+    rating: 4.1,
+    review_count: 75,
+    available: true,
+    apakah_laris: false,
     image: "IMG Wis Madang//Tahu Goreng.jpg",
     description: "Tahu goreng renyah.",
+  },
+  {
+    id: 6,
+    name: "Tempe Goreng",
+    category: "lauk",
+    price: 6000,
+    rating: 4.4,
+    review_count: 38,
+    available: true,
+    apakah_laris: false,
+    image: "IMG Wis Madang//Tempe Goreng.jpg",
+    description: "Tempe goreng renyah dan gurih.",
+  },
+  {
+    id: 7,
+    name: "Es Jeruk",
+    category: "minuman",
+    price: 5000,
+    rating: 4.2,
+    review_count: 60,
+    available: true,
+    apakah_laris: false,
+    image: "IMG Wis Madang//Es Jeruk.jpg",
+    description: "Es jeruk segar dan lezat.",
+  },
+  {
+    id: 8,
+    name: "Gurame Goreng",
+    category: "lauk",
+    price: 25000,
+    rating: 4.5,
+    review_count: 45,
+    available: true,
+    apakah_laris: false,
+    image: "IMG Wis Madang//Gurame Goreng.jpg",
+    description: "Gurame goreng renyah dan lezat.",
   },
 ];
 
