@@ -6,4 +6,5 @@ export interface Session {
   token: string;
   nama: string;
   peran: UserRole;
+  email?: string;
 }

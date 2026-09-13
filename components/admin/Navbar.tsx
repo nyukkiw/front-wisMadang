@@ -1,9 +1,10 @@
-// File untuk navbar admin, menampilkan informasi pengguna dan tombol logout
+// File untuk menampilkan navbar admin
 
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
 import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function Navbar() {
@@ -15,7 +16,8 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    router.push("/login");
+
+    router.push("/");
   };
 
   return (
@@ -23,12 +25,12 @@ export default function Navbar() {
       <div>
         <p className="text-sm text-gray-500">Selamat datang,</p>
 
-        <h2 className="font-semibold text-gray-900">{session?.nama || "Seller"}</h2>
+        <h2 className="font-semibold text-[#174C4F]">{session?.nama}</h2>
       </div>
 
       <div className="relative">
-        <button onClick={() => setOpen(!open)} className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-gray-100">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E9785F] font-bold text-white">{session?.nama?.charAt(0) || "U"}</div>
+        <button onClick={() => setOpen(!open)} className="flex items-center gap-3 rounded-xl p-2 hover:bg-gray-100">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E9785F] font-bold text-white">{session?.nama?.charAt(0).toUpperCase()}</div>
 
           <div className="hidden text-left sm:block">
             <p className="text-sm font-semibold">{session?.nama}</p>

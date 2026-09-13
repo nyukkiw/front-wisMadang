@@ -15,20 +15,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const SESSION_KEY = "wis_madang_session";
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedSession = localStorage.getItem("wis_madang_session");
+    try {
+      const savedSession = localStorage.getItem(SESSION_KEY);
 
-    if (savedSession) {
-      try {
-        const parsedSession: Session = JSON.parse(savedSession);
-        setSession(parsedSession);
-      } catch {
-        localStorage.removeItem("wis_madang_session");
+      if (savedSession) {
+        const parsed: Session = JSON.parse(savedSession);
+
+        setSession(parsed);
       }
+    } catch (error) {
+      console.error("Gagal membaca session:", error);
+
+      localStorage.removeItem(SESSION_KEY);
     }
 
     setLoading(false);
@@ -37,18 +43,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (newSession: Session) => {
     setSession(newSession);
 
-    localStorage.setItem("wis_madang_session", JSON.stringify(newSession));
+    localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
 
-    // Cookie untuk Middleware
-    document.cookie = `wis_madang_token=${newSession.token}; path=/; max-age=86400; SameSite=Lax`;
+    /*
+     * Cookie ini digunakan oleh Middleware.
+     * Middleware tidak dapat membaca React Context
+     * atau localStorage.
+     */
 
-    document.cookie = `wis_madang_role=${newSession.peran}; path=/; max-age=86400; SameSite=Lax`;
+    document.cookie = `wis_madang_token=${newSession.token}; ` + `path=/; max-age=86400; SameSite=Lax`;
+
+    document.cookie = `wis_madang_role=${newSession.peran}; ` + `path=/; max-age=86400; SameSite=Lax`;
   };
 
   const logout = () => {
     setSession(null);
 
-    localStorage.removeItem("wis_madang_session");
+    localStorage.removeItem(SESSION_KEY);
 
     document.cookie = "wis_madang_token=; path=/; max-age=0";
 

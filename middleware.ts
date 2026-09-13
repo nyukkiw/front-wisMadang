@@ -9,19 +9,32 @@ export function middleware(request: NextRequest) {
 
   const role = request.cookies.get("wis_madang_role")?.value;
 
-  // Hanya berlaku untuk /admin/*
+  /*
+   * Semua halaman seller/admin
+   * berada di bawah /admin/*
+   */
+
   if (pathname.startsWith("/admin")) {
-    // Belum login
+    /*
+     * Belum login
+     */
+
     if (!token || !role) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return NextResponse.redirect(new URL("/seller", request.url));
     }
 
-    // Pelanggan tidak boleh masuk area seller
+    /*
+     * Buyer tidak boleh masuk panel seller
+     */
+
     if (role === "pelanggan") {
       return NextResponse.redirect(new URL("/", request.url));
     }
 
-    // Role yang tidak dikenal
+    /*
+     * Hanya admin dan kasir
+     */
+
     if (role !== "admin" && role !== "kasir") {
       return NextResponse.redirect(new URL("/", request.url));
     }
