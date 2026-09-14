@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { dummyCategories, dummyMenus } from "@/data/dummyData";
 
@@ -25,7 +25,29 @@ export default function KasirPage() {
 
   const [selectedCategory, setSelectedCategory] = useState("semua");
 
+  
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartLoaded, setCartLoaded] = useState(false); // Menandai apakah keranjang sudah dimuat dari localStorage
+  useEffect(() => {
+    const savedCart = localStorage.getItem("wis-madang-cart");
+
+    if (savedCart) {
+      // Jika ada data keranjang yang tersimpan, muat ke state
+      setCart(JSON.parse(savedCart));
+    }
+    // Menandakan bahwa proses mengambil cart sudah selesai
+    setCartLoaded(true);
+  }, []);
+
+  // Menyimpan keranjang ke localStorage setiap kali cart berubah
+  useEffect(() => {
+    // Jangan simpan sebelum data awal selesai dimuat
+    if (!cartLoaded) {
+      return;
+    }
+
+    localStorage.setItem("wis-madang-cart", JSON.stringify(cart));
+  }, [cart, cartLoaded]);
 
   // Metode pembayaran
   const [paymentMethod, setPaymentMethod] = useState("QRIS");
@@ -163,7 +185,7 @@ export default function KasirPage() {
     // Buat nomor order dummy
     // Contoh:
     // MADANG-2026-00001
-    const number = `MADANG-${new Date().getFullYear()}-` + `${String(Math.floor(Math.random() * 100000)).padStart(5, "0")}`;
+    const number = `MADANG-${new Date().getFullYear()}-` + `${String(Math.floor(Math.random() * 10000)).padStart(4, "0")}`;
 
     setOrderNumber(number);
 
