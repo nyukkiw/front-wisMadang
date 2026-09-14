@@ -65,14 +65,14 @@ export default function ReceiptModal({ orderNumber, items, subtotal, tax, total,
 
         {/* Ringkasan */}
         <div className="mt-5 border-t border-[#dce8e2] pt-4">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Subtotal</span>
+          <div className="flex justify-between text-sm font-semibold text-gray-800">
+            <span>Subtotal</span>
 
             <span>Rp {subtotal.toLocaleString("id-ID")}</span>
           </div>
 
-          <div className="mt-2 flex justify-between text-sm">
-            <span className="text-gray-600">Pajak 10%</span>
+          <div className="mt-2 flex justify-between text-sm font-semibold text-gray-800">
+            <span>Pajak 10%</span>
 
             <span>Rp {tax.toLocaleString("id-ID")}</span>
           </div>

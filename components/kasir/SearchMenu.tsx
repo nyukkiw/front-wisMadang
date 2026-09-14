@@ -16,8 +16,8 @@ export default function SearchMenu({ value, onChange }: SearchMenuProps) {
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Cari menu..."
-        className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition focus:border-[#174C4F] focus:ring-2 focus:ring-[#174C4F]/10"
+        placeholder="Cari menu yang kamu mau..."
+        className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm font-medium text-gray-900 outline-none transition placeholder:font-semibold placeholder:text-gray-600 focus:border-[#174C4F] focus:ring-2 focus:ring-[#174C4F]/10"
       />
     </div>
   );

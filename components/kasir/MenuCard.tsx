@@ -46,12 +46,12 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
       <h3 className="font-semibold text-[#174C4F]">{menu.name}</h3>
 
       {/* Rating */}
-      <div className="mt-1 flex items-center gap-1 text-sm">
-        <span className="text-yellow-500">★</span>
+      <div className="mt-1 flex items-center gap-1 text-sm font-semibold text-gray-700">
+        <span className="font-bold text-yellow-500">★</span>
 
         <span className="font-medium">{menu.rating}</span>
 
-        <span className="text-gray-400">({menu.review_count})</span>
+        <span className="font-medium text-gray-600">({menu.review_count})</span>
       </div>
 
       {/* Harga + tombol */}

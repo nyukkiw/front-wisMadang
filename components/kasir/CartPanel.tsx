@@ -39,11 +39,11 @@ export default function CartPanel({ cart, suggestions, paymentMethod, onPaymentM
                 <p className="truncate text-sm font-semibold text-[#174a43]">{item.name}</p>
                 <p className="text-xs text-gray-500">Rp {item.price.toLocaleString("id-ID")}</p>
                 <div className="mt-2 flex items-center gap-2">
-                  <button type="button" onClick={() => onDecrease(item.id)} className="h-6 w-6 rounded-full bg-gray-100">
+                  <button type="button" onClick={() => onDecrease(item.id)} aria-label={`Kurangi ${item.name}`} className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 bg-gray-100 text-lg font-bold leading-none text-gray-800 hover:bg-gray-200">
                     -
                   </button>
-                  <span className="text-sm">{item.qty}</span>
-                  <button type="button" onClick={() => onIncrease(item.id)} className="h-6 w-6 rounded-full bg-gray-100">
+                  <span className="min-w-5 text-center text-sm font-bold text-gray-900">{item.qty}</span>
+                  <button type="button" onClick={() => onIncrease(item.id)} aria-label={`Tambah ${item.name}`} className="flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 bg-gray-100 text-lg font-bold leading-none text-gray-800 hover:bg-gray-200">
                     +
                   </button>
                 </div>
@@ -58,11 +58,11 @@ export default function CartPanel({ cart, suggestions, paymentMethod, onPaymentM
       <AISuggestion suggestions={suggestions} onAdd={onAddSuggestion} />
       <PaymentMethod selectedMethod={paymentMethod} onChange={onPaymentMethodChange} />
       <div className="mt-5 border-t border-gray-100 pt-4 text-sm">
-        <div className="flex justify-between">
+        <div className="flex justify-between font-semibold text-gray-800">
           <span>Subtotal</span>
           <span>Rp {subtotal.toLocaleString("id-ID")}</span>
         </div>
-        <div className="mt-2 flex justify-between">
+        <div className="mt-2 flex justify-between font-semibold text-gray-800">
           <span>Pajak 10%</span>
           <span>Rp {tax.toLocaleString("id-ID")}</span>
         </div>
