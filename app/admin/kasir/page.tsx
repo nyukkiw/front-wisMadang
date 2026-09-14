@@ -4,8 +4,7 @@
 
 import { useMemo, useState } from "react";
 
-import {dummyCategories} from "@/data/dummyData";
-import {dummyMenus} from "@/data/dummyData";
+import { dummyCategories, dummyMenus } from "@/data/dummyData";
 
 import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
 
@@ -15,39 +14,51 @@ import SearchMenu from "@/components/kasir/SearchMenu";
 
 import CartPanel, { CartItem } from "@/components/kasir/CartPanel";
 
+import ReceiptModal from "@/components/kasir/ReceiptModal";
+
 export default function KasirPage() {
+  // =========================
+  // STATE
+  // =========================
+
   const [search, setSearch] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState("semua");
 
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  /*
-   * Filter menu berdasarkan:
-   *
-   * 1. Search
-   * 2. Kategori
-   */
+  // Metode pembayaran
+  const [paymentMethod, setPaymentMethod] = useState("QRIS");
+
+  // Menampilkan struk
+  const [showReceipt, setShowReceipt] = useState(false);
+
+  // Nomor pesanan
+  const [orderNumber, setOrderNumber] = useState("");
+
+  // =========================
+  // FILTER MENU
+  // =========================
 
   const filteredMenus = useMemo(() => {
     return dummyMenus.filter((menu) => {
-      const matchSearch = menu.name.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = menu.name.toLowerCase().includes(search.toLowerCase());
 
-      const matchCategory = selectedCategory === "semua" || menu.category === selectedCategory;
+      const matchesCategory = selectedCategory === "semua" || menu.category === selectedCategory;
 
-      return matchSearch && matchCategory;
+      return matchesSearch && matchesCategory;
     });
   }, [search, selectedCategory]);
 
-  /*
-   * Tambahkan menu ke keranjang
-   */
+  // =========================
+  // TAMBAH MENU
+  // =========================
 
-  const handleAddToCart = (menu: MenuItem) => {
+  const handleAddMenu = (menu: MenuItem) => {
     setCart((currentCart) => {
-      const existing = currentCart.find((item) => item.id === menu.id);
+      const existingItem = currentCart.find((item) => item.id === menu.id);
 
-      if (existing) {
+      if (existingItem) {
         return currentCart.map((item) =>
           item.id === menu.id
             ? {
@@ -68,9 +79,9 @@ export default function KasirPage() {
     });
   };
 
-  /*
-   * Tambah quantity
-   */
+  // =========================
+  // TAMBAH QUANTITY
+  // =========================
 
   const handleIncrease = (id: number) => {
     setCart((currentCart) =>
@@ -85,9 +96,9 @@ export default function KasirPage() {
     );
   };
 
-  /*
-   * Kurangi quantity
-   */
+  // =========================
+  // KURANGI QUANTITY
+  // =========================
 
   const handleDecrease = (id: number) => {
     setCart((currentCart) =>
@@ -104,69 +115,157 @@ export default function KasirPage() {
     );
   };
 
-  /*
-   * Hapus item
-   */
+  // =========================
+  // HAPUS ITEM
+  // =========================
 
   const handleRemove = (id: number) => {
     setCart((currentCart) => currentCart.filter((item) => item.id !== id));
   };
 
+  // =========================
+  // AI SUGGESTION
+  // =========================
+
+  const suggestions = useMemo(() => {
+    // AI suggestion hanya muncul
+    // jika ada Nasi atau Lauk
+    const hasNasiOrLauk = cart.some((item) => item.category === "nasi" || item.category === "lauk");
+
+    if (!hasNasiOrLauk) {
+      return [];
+    }
+
+    // Ambil menu yang belum ada
+    // di keranjang
+    const cartIds = cart.map((item) => item.id);
+
+    return dummyMenus.filter((menu) => menu.available && !cartIds.includes(menu.id) && (menu.category === "lauk" || menu.category === "minuman")).slice(0, 2);
+  }, [cart]);
+
+  // =========================
+  // TAMBAH DARI AI
+  // =========================
+
+  const handleAddSuggestion = (menu: MenuItem) => {
+    handleAddMenu(menu);
+  };
+
+  // =========================
+  // BAYAR
+  // =========================
+
+  const handlePay = () => {
+    if (cart.length === 0) {
+      return;
+    }
+
+    // Buat nomor order dummy
+    // Contoh:
+    // MADANG-2026-00001
+    const number = `MADANG-${new Date().getFullYear()}-` + `${String(Math.floor(Math.random() * 100000)).padStart(5, "0")}`;
+
+    setOrderNumber(number);
+
+    // Tampilkan struk
+    setShowReceipt(true);
+  };
+
+  // =========================
+  // HITUNG TOTAL
+  // =========================
+
+  const subtotal = cart.reduce((total, item) => total + item.price * item.qty, 0);
+
+  const tax = subtotal * 0.1;
+
+  const total = subtotal + tax;
+
+  // =========================
+  // PESANAN BARU
+  // =========================
+
+  const handleNewOrder = () => {
+    // Kosongkan keranjang
+    setCart([]);
+
+    // Reset metode pembayaran
+    setPaymentMethod("QRIS");
+
+    // Tutup struk
+    setShowReceipt(false);
+
+    // Reset nomor order
+    setOrderNumber("");
+  };
+
+  // =========================
+  // TAMPILAN
+  // =========================
+
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div>
-        <p className="text-sm font-medium text-[#E9785F]">Point of Sale</p>
+    <main className="min-h-screen bg-[#f5f1e8] p-6">
+      <div className="mx-auto max-w-[1600px]">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-[#174a43]">Kasir</h1>
 
-        <h1 className="mt-1 text-2xl font-bold text-[#174C4F]">Kasir</h1>
+          <p className="mt-1 text-sm text-gray-600">Kelola pesanan pelanggan dengan cepat</p>
+        </div>
 
-        <p className="mt-1 text-sm text-gray-500">Kelola pesanan pelanggan dengan cepat.</p>
-      </div>
-
-      {/* Main POS */}
-      <div className="grid min-h-[calc(100vh-220px)] gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-        {/* LEFT — MENU */}
-        <section className="min-w-0">
-          {/* Search */}
-          <div className="mb-4">
+        {/* Layout */}
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          {/* MENU */}
+          <section>
+            {/* Search */}
             <SearchMenu value={search} onChange={setSearch} />
-          </div>
 
-          {/* Category */}
-          <div className="mb-5">
-            <MenuFilter categories={dummyCategories} selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
-          </div>
-
-          {/* Result info */}
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-800">Daftar Menu</h2>
-
-            <span className="text-sm text-gray-400">{filteredMenus.length} menu</span>
-          </div>
-
-          {/* Menu Grid */}
-          {filteredMenus.length === 0 ? (
-            <div className="rounded-2xl bg-white p-10 text-center">
-              <div className="text-4xl">🔍</div>
-
-              <h3 className="mt-3 font-semibold text-gray-700">Menu tidak ditemukan</h3>
-
-              <p className="mt-1 text-sm text-gray-400">Coba gunakan kata kunci atau kategori lain.</p>
+            {/* Filter */}
+            <div className="mt-4">
+              <MenuFilter categories={dummyCategories} selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
             </div>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+
+            {/* Menu Grid */}
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {filteredMenus.map((menu) => (
-                <MenuCard key={menu.id} menu={menu} onAdd={handleAddToCart} />
+                <MenuCard key={menu.id} menu={menu} onAdd={handleAddMenu} />
               ))}
             </div>
-          )}
-        </section>
 
-        {/* RIGHT — CART */}
-        <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-120px)]">
-          <CartPanel cart={cart} onIncrease={handleIncrease} onDecrease={handleDecrease} onRemove={handleRemove} />
+            {/* Tidak ditemukan */}
+            {filteredMenus.length === 0 && (
+              <div className="mt-6 rounded-2xl bg-[#e6efe9] p-10 text-center">
+                <div className="text-4xl">🔍</div>
+
+                <p className="mt-3 font-semibold text-[#174a43]">Menu tidak ditemukan</p>
+
+                <p className="mt-1 text-sm text-gray-500">Coba gunakan kata kunci atau kategori lain.</p>
+              </div>
+            )}
+          </section>
+
+          {/* PESANAN */}
+          <aside>
+            <CartPanel
+              cart={cart}
+              suggestions={suggestions}
+              paymentMethod={paymentMethod}
+              onPaymentMethodChange={setPaymentMethod}
+              onAddSuggestion={handleAddSuggestion}
+              onIncrease={handleIncrease}
+              onDecrease={handleDecrease}
+              onRemove={handleRemove}
+              onPay={handlePay}
+            />
+          </aside>
         </div>
       </div>
-    </div>
+
+      {/* =========================
+          STRUK DIGITAL
+      ========================= */}
+
+      {showReceipt && <ReceiptModal orderNumber={orderNumber} items={cart} subtotal={subtotal} tax={tax} total={total} paymentMethod={paymentMethod} onNewOrder={handleNewOrder} />}
+    </main>
   );
 }
