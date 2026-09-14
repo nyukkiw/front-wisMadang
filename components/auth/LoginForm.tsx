@@ -49,9 +49,11 @@ export default function LoginForm() {
 
     setLoading(false);
 
-    // Redirect berdasarkan role
-    if (user.role === "admin" || user.role === "kasir") {
+    // Redirect halaman dashboard berdasarkan role
+    if (user.role === "admin") {
       router.push("/admin");
+    } else if (user.role === "kasir") {
+      router.push("/admin/kasir");
     } else {
       router.push("/pelanggan");
     }

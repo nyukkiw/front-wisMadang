@@ -18,6 +18,10 @@ export default function Sidebar() {
 
       <nav className="space-y-1 p-4">
         <Link href="/admin" className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700">
+          Kasir
+        </Link>
+
+        <Link href="/admin/kasir" className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700">
           Dashboard
         </Link>
 
@@ -26,7 +30,7 @@ export default function Sidebar() {
         </Link>
 
         <Link href="/admin/pesanan" className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700">
-          Pesanan
+          Analisis Ulasan
         </Link>
 
         {session?.peran === "admin" && (
