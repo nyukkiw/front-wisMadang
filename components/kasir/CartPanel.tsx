@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import AISuggestion from "@/components/kasir/AISuggestion";
 import type { MenuItem } from "@/components/kasir/MenuCard";
 import PaymentMethod from "@/components/kasir/PaymentMethod";
@@ -33,7 +34,7 @@ export default function CartPanel({ cart, suggestions, paymentMethod, onPaymentM
         ) : (
           cart.map((item) => (
             <div key={item.id} className="flex items-center gap-3 border-b border-gray-100 pb-3">
-              <span className="text-2xl">{item.image}</span>
+              <Image src={item.image} alt={item.name} width={48} height={48} className="h-12 w-12 rounded-lg object-cover" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-[#174a43]">{item.name}</p>
                 <p className="text-xs text-gray-500">Rp {item.price.toLocaleString("id-ID")}</p>

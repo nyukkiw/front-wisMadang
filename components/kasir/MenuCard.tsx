@@ -2,6 +2,8 @@
 
 "use client";
 
+import Image from "next/image";
+
 export interface MenuItem {
   // Interface untuk menu item
   id: number;
@@ -36,7 +38,9 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
       {menu.apakah_laris && menu.available && <span className="absolute right-3 top-3 rounded-full bg-[#E9785F] px-2.5 py-1 text-xs font-semibold text-white">Laris</span>}
 
       {/* Visual */}
-      <div className="mb-4 flex h-32 items-center justify-center rounded-xl bg-[#EAF2ED] text-6xl">{menu.image}</div>
+      <div className="relative mb-4 h-32 overflow-hidden rounded-xl bg-[#EAF2ED]">
+        <Image src={menu.image} alt={menu.name} fill sizes="(max-width: 1280px) 33vw, 300px" className="object-cover" />
+      </div>
 
       {/* Nama */}
       <h3 className="font-semibold text-[#174C4F]">{menu.name}</h3>

@@ -2,6 +2,8 @@
 
 "use client";
 
+import Image from "next/image";
+
 interface ReceiptItem {
   name: string;
   price: number;
@@ -45,7 +47,7 @@ export default function ReceiptModal({ orderNumber, items, subtotal, tax, total,
           {items.map((item, index) => (
             <div key={`${item.name}-${index}`} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span>{item.image}</span>
+                <Image src={item.image} alt={item.name} width={32} height={32} className="h-8 w-8 rounded object-cover" />
 
                 <div>
                   <p className="text-sm font-medium text-[#174a43]">{item.name}</p>

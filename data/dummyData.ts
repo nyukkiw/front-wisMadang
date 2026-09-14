@@ -60,7 +60,7 @@ export const dummyMenus = [
     review_count: 120,
     available: true,
     apakah_laris: true,
-    image: "IMG Wis Madang//Nasi Goreng.jpg",
+    image: "/IMG Wis Madang/Nasi Goreng.jpg",
     description: "Nasi goreng dengan telur dan sayuran.",
   },
   {
@@ -72,7 +72,7 @@ export const dummyMenus = [
     review_count: 95,
     available: true,
     apakah_laris: false,
-    image: "IMG Wis Madang//Nasi Putih.jpg",
+    image: "/IMG Wis Madang/Nasi Putih.jpg",
     description: "Nasi putih biasa.",
   },
   {
@@ -84,7 +84,7 @@ export const dummyMenus = [
     review_count: 80,
     available: true,
     apakah_laris: false,
-    image: "IMG Wis Madang//Es Teh.jpg",
+    image: "/IMG Wis Madang/Es Teh.jpg",
     description: "Es teh manis segar.",
   },
   {
@@ -96,7 +96,7 @@ export const dummyMenus = [
     review_count: 110,
     available: true,
     apakah_laris: true,
-    image: "IMG Wis Madang//Kopi Hitam.jpg",
+    image: "/IMG Wis Madang/Kopi Hitam.jpg",
     description: "Kopi hitam dengan rasa kuat.",
   },
   {
@@ -108,7 +108,7 @@ export const dummyMenus = [
     review_count: 75,
     available: true,
     apakah_laris: false,
-    image: "IMG Wis Madang//Tahu Goreng.jpg",
+    image: "/IMG Wis Madang/Tahu Goreng.jpg",
     description: "Tahu goreng renyah.",
   },
   {
@@ -120,7 +120,7 @@ export const dummyMenus = [
     review_count: 38,
     available: true,
     apakah_laris: false,
-    image: "IMG Wis Madang//Tempe Goreng.jpg",
+    image: "/IMG Wis Madang/Tempe Goreng.jpg",
     description: "Tempe goreng renyah dan gurih.",
   },
   {
@@ -132,7 +132,7 @@ export const dummyMenus = [
     review_count: 60,
     available: true,
     apakah_laris: false,
-    image: "IMG Wis Madang//Es Jeruk.jpg",
+    image: "/IMG Wis Madang/Es Jeruk.jpg",
     description: "Es jeruk segar dan lezat.",
   },
   {
@@ -144,7 +144,7 @@ export const dummyMenus = [
     review_count: 45,
     available: true,
     apakah_laris: false,
-    image: "IMG Wis Madang//Gurame Goreng.jpg",
+    image: "/IMG Wis Madang/Gurame Goreng.jpg",
     description: "Gurame goreng renyah dan lezat.",
   },
 ];

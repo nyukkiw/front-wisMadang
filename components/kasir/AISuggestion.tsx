@@ -2,6 +2,7 @@
 
 "use client";
 
+import Image from "next/image";
 import type { MenuItem } from "@/components/kasir/MenuCard";
 
 interface AISuggestionProps {
@@ -34,7 +35,7 @@ export default function AISuggestion({ suggestions, onAdd }: AISuggestionProps) 
         {suggestions.map((menu) => (
           <div key={menu.id} className="flex items-center justify-between rounded-xl bg-white p-3">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">{menu.image}</span>
+              <Image src={menu.image} alt={menu.name} width={40} height={40} className="h-10 w-10 rounded-lg object-cover" />
 
               <div>
                 <p className="text-sm font-semibold text-[#174a43]">{menu.name}</p>
