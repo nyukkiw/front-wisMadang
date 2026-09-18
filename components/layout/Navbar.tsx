@@ -2,21 +2,100 @@
 
 "use client";
 
-import { useAuth } from "@/components/auth/AuthProvider";
+import { useState } from "react";
 
-export default function Navbar() {
-  const { session } = useAuth();
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+import { useAuth } from "@/components/auth/AuthProvider";
+import { UserRole } from "@/lib/auth";
+
+interface NavbarProps {
+  role: UserRole;
+  nama?: string;
+  sidebarOpen: boolean;
+  onMenuToggle: () => void;
+}
+
+export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuToggle }: NavbarProps) {
+  const router = useRouter();
+  const { logout } = useAuth();
+  const [showProfile, setShowProfile] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    router.replace("/seller");
+  };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white px-6">
-      <div>
-        <h2 className="font-semibold text-gray-800">Dashboard</h2>
-      </div>
+    <header className="sticky top-0 z-50 border-b border-[#C08A57]/40 bg-[#174a43] text-white">
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+        {/* =========================
+            KIRI
+        ========================= */}
+        <div className="flex items-center gap-3">
+          <button onClick={onMenuToggle} className="rounded-lg p-2 text-xl hover:bg-[#C08A57]" aria-label={sidebarOpen ? "Tutup sidebar" : "Buka sidebar"}>
+            {sidebarOpen ? "‹" : "☰"}
+          </button>
 
-      <div className="text-right">
-        <p className="text-sm font-medium text-gray-800">{session?.nama}</p>
+          <Image src="/IMG Wis Madang/Wis Madang Logo.jpg" alt="Logo WIS MADANG" width={42} height={42} className="h-10 w-10 rounded-xl object-cover" priority />
 
-        <p className="text-xs capitalize text-gray-500">{session?.peran}</p>
+          <div>
+            <h1 className="font-bold">WIS MADANG</h1>
+
+            <p className="text-xs text-white/70">Cafe & Catering</p>
+          </div>
+        </div>
+
+        {/* =========================
+            KANAN
+        ========================= */}
+
+        {/* PELANGGAN */}
+        {role === "pelanggan" && (
+          <div className="flex items-center gap-5 text-sm">
+            <button className="hover:text-[#f5c2a8]">Masuk / Daftar</button>
+
+            <button className="text-xl hover:text-[#f5c2a8]" title="Keranjang">
+              🛒
+            </button>
+
+            <div className="hidden xl:block text-right">
+              <p>☎ 0812-3456-7890</p>
+              <p className="text-xs text-white/70">Jl. Contoh No. 123, Yogyakarta</p>
+            </div>
+
+            <div className="hidden lg:block text-xs text-white/70">Buka 08.00–21.00</div>
+          </div>
+        )}
+
+        {/* KASIR & ADMIN */}
+        {(role === "kasir" || role === "admin") && (
+          <div className="relative">
+            <button onClick={() => setShowProfile(!showProfile)} className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-[#C08A57]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4EAE1] text-[#2C2520]">👤</div>
+
+              <div className="hidden text-left sm:block">
+                <p className="text-sm font-semibold">{nama}</p>
+
+                <p className="text-xs text-white/60 capitalize">{role}</p>
+              </div>
+
+              <span>⌄</span>
+            </button>
+
+            {/* DROPDOWN */}
+            {showProfile && (
+              <div className="absolute right-0 mt-2 w-48 rounded-xl bg-[#F4EAE1] p-2 text-[#2C2520] shadow-xl">
+                <button className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-[#C08A57]/20">Edit Profil</button>
+
+                <button onClick={handleLogout} className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

@@ -226,13 +226,13 @@ export default function KasirPage() {
   // =========================
 
   return (
-    <main className="min-h-screen bg-[#f5f1e8] p-6">
+    <main className="min-h-screen bg-[#FCF9F6] p-6">
       <div className="mx-auto max-w-[1600px]">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#174a43]">Kasir</h1>
+          <h1 className="text-2xl font-bold text-[#2C2520]">Kasir</h1>
 
-          <p className="mt-1 text-sm text-gray-600">Kelola pesanan pelanggan dengan cepat</p>
+          <p className="mt-1 text-sm text-[#2C2520]/65">Kelola pesanan pelanggan dengan cepat</p>
         </div>
 
         {/* Layout */}

@@ -28,7 +28,7 @@ const paymentMethods = [
 export default function PaymentMethod({ selectedMethod, onChange }: PaymentMethodProps) {
   return (
     <div className="mt-5">
-      <p className="mb-2 text-sm font-semibold text-[#174a43]">Metode Pembayaran</p>
+      <p className="mb-2 text-sm font-semibold text-[#2C2520]">Metode Pembayaran</p>
 
       <div className="grid grid-cols-3 gap-2">
         {paymentMethods.map((method) => {
@@ -38,7 +38,7 @@ export default function PaymentMethod({ selectedMethod, onChange }: PaymentMetho
             <button
               key={method.id}
               onClick={() => onChange(method.id)}
-              className={`rounded-xl border p-3 text-center transition ${isSelected ? "border-[#174a43] bg-[#174a43] text-white" : "border-[#dce8e2] bg-white text-[#174a43] hover:bg-[#e6efe9]"}`}
+              className={`rounded-xl border p-3 text-center transition ${isSelected ? "border-[#C08A57] bg-[#C08A57] text-white" : "border-[#e2d3c5] bg-[#FCF9F6] text-[#2C2520] hover:bg-[#C08A57]/20"}`}
             >
               <div className="text-xl">{method.icon}</div>
 

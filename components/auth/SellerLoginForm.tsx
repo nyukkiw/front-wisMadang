@@ -77,7 +77,7 @@ export default function SellerLoginForm() {
 
     setLoading(false);
 
-    router.push("/admin");
+    router.push(user.role === "kasir" ? "/admin/kasir" : "/admin");
   };
 
   return (

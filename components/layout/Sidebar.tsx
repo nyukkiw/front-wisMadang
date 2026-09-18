@@ -3,48 +3,66 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/components/auth/AuthProvider";
 
-export default function Sidebar() {
-  const { session, logout } = useAuth();
+import { UserRole } from "@/lib/auth";
+
+interface SidebarProps {
+  role: UserRole;
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+export default function Sidebar({ role, isOpen, onToggle }: SidebarProps) {
+  const sidebarClass = `fixed inset-y-0 left-0 z-40 w-56 border-r border-[#e2d3c5] bg-[#F4EAE1] transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"}`;
+
+  const linkClass = "mb-1 flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-[#2C2520] hover:bg-[#C08A57]/20";
+
+  const navigation =
+    role === "kasir"
+      ? {
+          title: "Kasir",
+          links: [{ href: "/admin/kasir", label: "🧾", text: "Transaksi" }],
+        }
+      : role === "pelanggan"
+        ? {
+            title: "Pelanggan",
+            links: [
+              { href: "/", label: "🏠", text: "Dashboard" },
+              { href: "/menu", label: "🍛", text: "Menu" },
+              { href: "/catering", label: "🍱", text: "Paket Catering" },
+            ],
+          }
+        : {
+            title: "Admin",
+            links: [
+              { href: "/admin", label: "📊", text: "Dashboard" },
+              { href: "/admin/menu", label: "🍛", text: "Menu" },
+              { href: "/admin/ai-insight", label: "✨", text: "AI Ulasan" },
+            ],
+          };
+
+  // =========================
+  // SIDEBAR PELANGGAN
+  // =========================
 
   return (
-    <aside className="fixed left-0 top-0 hidden h-screen w-64 bg-white shadow-md md:block">
-      <div className="border-b px-6 py-5">
-        <h1 className="text-xl font-bold text-green-700">Wis Madang</h1>
+    <aside className={sidebarClass} aria-label="Navigasi utama">
+      <nav className="p-4">
+        <div className="mb-4 flex items-center justify-between px-3">
+          <p className="text-xs font-semibold uppercase text-[#2C2520]/60">{navigation.title}</p>
 
-        <p className="mt-1 text-xs text-gray-500">Panel {session?.peran}</p>
-      </div>
+          <button onClick={onToggle} className="rounded-lg p-1 text-[#2C2520] hover:bg-[#C08A57]/20 md:hidden" aria-label="Tutup sidebar">
+            ×
+          </button>
+        </div>
 
-      <nav className="space-y-1 p-4">
-        <Link href="/admin" className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700">
-          Kasir
-        </Link>
-
-        <Link href="/admin/kasir" className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700">
-          Dashboard
-        </Link>
-
-        <Link href="/admin/menu" className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700">
-          Menu
-        </Link>
-
-        <Link href="/admin/pesanan" className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700">
-          Analisis Ulasan
-        </Link>
-
-        {session?.peran === "admin" && (
-          <Link href="/admin/pengguna" className="block rounded-lg px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-700">
-            Pengguna
+        {navigation.links.map((link) => (
+          <Link key={link.href} href={link.href} className={linkClass} onClick={() => window.innerWidth < 768 && onToggle()}>
+            <span aria-hidden="true">{link.label}</span>
+            <span>{link.text}</span>
           </Link>
-        )}
+        ))}
       </nav>
-
-      <div className="absolute bottom-0 w-full border-t p-4">
-        <button onClick={logout} className="w-full rounded-lg bg-red-50 px-4 py-3 text-left text-red-600 hover:bg-red-100">
-          Keluar
-        </button>
-      </div>
     </aside>
   );
 }

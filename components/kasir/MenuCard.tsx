@@ -30,7 +30,7 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
     <div
       className={`
         relative overflow-hidden rounded-2xl border
-        bg-white p-4 shadow-sm transition
+        bg-[#F4EAE1] p-4 shadow-sm transition
         ${!menu.available ? "cursor-not-allowed opacity-50 grayscale" : "hover:-translate-y-0.5 hover:shadow-md"} 
       `} // Jika menu habis kartu buram dan button tidak bisa diklik, jika tersedia kartu bisa di hover
     >
@@ -43,7 +43,7 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
       </div>
 
       {/* Nama */}
-      <h3 className="font-semibold text-[#174C4F]">{menu.name}</h3>
+      <h3 className="font-semibold text-[#2C2520]">{menu.name}</h3>
 
       {/* Rating */}
       <div className="mt-1 flex items-center gap-1 text-sm font-semibold text-gray-700">
@@ -66,7 +66,7 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
             flex h-9 w-9 items-center justify-center
             rounded-full text-xl font-semibold
             transition
-            ${menu.available ? "bg-[#E9785F] text-white hover:opacity-90" : "cursor-not-allowed bg-gray-200 text-gray-400"}
+            ${menu.available ? "bg-[#C08A57] text-white hover:bg-[#a97142]" : "cursor-not-allowed bg-gray-200 text-gray-400"}
           `}
         >
           +

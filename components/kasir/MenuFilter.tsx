@@ -27,7 +27,7 @@ export default function MenuFilter({ categories, selectedCategory, onCategoryCha
             className={`
               whitespace-nowrap rounded-full px-4 py-2
               text-sm font-medium transition
-              ${active ? "bg-[#174C4F] text-white" : "bg-white text-gray-600 hover:bg-[#EAF2ED]"}
+              ${active ? "bg-[#C08A57] text-white" : "bg-[#F4EAE1] text-[#2C2520] hover:bg-[#C08A57]/20"}
             `}
           >
             {category.name}
