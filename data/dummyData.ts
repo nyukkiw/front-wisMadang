@@ -183,3 +183,39 @@ export const dummyOrders = [
     ],
   },
 ];
+
+export const dummyCateringPackages = [
+  {
+    id: 1,
+    name: "Paket Hemat Keluarga",
+    description: "Nasi, ayam, sayur, sambal, dan minuman.",
+    price: 85000,
+    portions: 4,
+    image: "/IMG Wis Madang/Nasi Box.jpg",
+  },
+  {
+    id: 2,
+    name: "Paket Rapat",
+    description: "Paket makan siang untuk acara kantor.",
+    price: 150000,
+    portions: 8,
+    image: "/IMG Wis Madang/Prasmanan.jpg",
+  },
+  {
+    id: 3,
+    name: "Paket Acara Besar",
+    description: "Paket catering prasmanan untuk acara keluarga.",
+    price: 350000,
+    portions: 20,
+    image: "/IMG Wis Madang/Prasmanan.jpg",
+  },
+];
+
+export const dummyPromos = [
+  {
+    id: 1,
+    title: "Diskon Menu Minuman",
+    description: "Diskon 20% untuk semua minuman hari ini.",
+    discount: "20%",
+  },
+];
