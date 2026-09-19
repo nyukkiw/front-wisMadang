@@ -5,6 +5,7 @@
 import { useState } from "react";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -54,11 +55,13 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
         {/* PELANGGAN */}
         {role === "pelanggan" && (
           <div className="flex items-center gap-5 text-sm">
-            <button className="hover:text-[#f5c2a8]">Masuk / Daftar</button>
+            <Link href="/login" className="hover:text-[#C08A57]">
+              Masuk / Daftar
+            </Link>
 
-            <button className="text-xl hover:text-[#f5c2a8]" title="Keranjang">
+            <Link href="/pelanggan/keranjang" className="text-xl hover:text-[#C08A57]" title="Keranjang">
               🛒
-            </button>
+            </Link>
 
             <div className="hidden xl:block text-right">
               <p>☎ 0812-3456-7890</p>

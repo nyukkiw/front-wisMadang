@@ -27,9 +27,10 @@ export default function Sidebar({ role, isOpen, onToggle }: SidebarProps) {
         ? {
             title: "Pelanggan",
             links: [
-              { href: "/", label: "🏠", text: "Dashboard" },
-              { href: "/menu", label: "🍛", text: "Menu" },
-              { href: "/catering", label: "🍱", text: "Paket Catering" },
+              { href: "/pelanggan", label: "🏠", text: "Dashboard" },
+              { href: "/pelanggan/menu", label: "🍛", text: "Menu" },
+              { href: "/pelanggan/catering", label: "🍱", text: "Paket Catering" },
+              { href: "/pelanggan/keranjang", label: "🛒", text: "Keranjang" },
             ],
           }
         : {
