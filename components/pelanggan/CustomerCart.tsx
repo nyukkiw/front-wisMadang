@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import Image from "next/image";
 
-import PaymentMethod from "@/components/kasir/PaymentMethod";
+import PaymentMethod from "@/components/kasir/PaymentMethod"; // Komponen untuk memilih metode pembayaran
+import ReceiptModal from "@/components/kasir/ReceiptModal"; // Komponen modal struk pembayaran
+import ReviewForm, { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
+import { notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 
 const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
 
@@ -21,13 +24,17 @@ interface CustomerCartItem {
 
 export default function CustomerCart() {
   const [items, setItems] = useState<CustomerCartItem[]>([]);
+  const [cartLoaded, setCartLoaded] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("QRIS");
-  const [orderMessage, setOrderMessage] = useState("");
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [orderNumber, setOrderNumber] = useState("");
 
   useEffect(() => {
     const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
 
     if (!savedCart) {
+      setCartLoaded(true);
       return;
     }
 
@@ -36,11 +43,18 @@ export default function CustomerCart() {
     } catch {
       localStorage.removeItem(CUSTOMER_CART_KEY);
     }
+
+    setCartLoaded(true);
   }, []);
 
   useEffect(() => {
+    if (!cartLoaded) {
+      return;
+    }
+
     localStorage.setItem(CUSTOMER_CART_KEY, JSON.stringify(items));
-  }, [items]);
+    notifyCustomerCartUpdated();
+  }, [items, cartLoaded]);
 
   const subtotal = useMemo(() => items.reduce((total, item) => total + item.price * item.quantity, 0), [items]);
   const tax = subtotal * 0.1;
@@ -59,8 +73,43 @@ export default function CustomerCart() {
       return;
     }
 
-    setOrderMessage(`Pesanan berhasil dibuat dengan pembayaran ${paymentMethod}.`);
+    const number = `MADANG-${new Date().getFullYear()}-` + `${String(Math.floor(Math.random() * 10000)).padStart(4, "0")}`;
+
+    setOrderNumber(number);
+    setShowReceipt(true);
+  };
+
+  const handleNewOrder = () => {
     setItems([]);
+    setPaymentMethod("QRIS");
+    setShowReview(false);
+    setShowReceipt(false);
+    setOrderNumber("");
+  };
+
+  const handleReviewSubmit = ({ rating, comment }: Pick<CustomerReview, "rating" | "comment">) => { // event handler untuk submit ulasan pelanggan
+    const savedReviews = localStorage.getItem(CUSTOMER_REVIEWS_KEY);
+    let reviews: CustomerReview[] = [];
+
+    if (savedReviews) {
+      try {
+        reviews = JSON.parse(savedReviews);
+      } catch {
+        localStorage.removeItem(CUSTOMER_REVIEWS_KEY);
+      }
+    }
+
+    const review: CustomerReview = { // membuat objek ulasan baru dengan informasi yang diberikan
+      id: `${orderNumber}-${Date.now()}`,
+      orderNumber,
+      itemNames: items.map((item) => item.name),
+      rating,
+      comment,
+      createdAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem(CUSTOMER_REVIEWS_KEY, JSON.stringify([review, ...reviews])); // menyimpan ulasan baru ke localStorage, menambahkan di awal array ulasan yang sudah ada
+    setShowReview(false);
   };
 
   return (
@@ -69,8 +118,6 @@ export default function CustomerCart() {
         <h1 className="text-2xl font-bold text-[#2C2520]">Keranjang Belanja</h1>
         <p className="mt-2 text-[#2C2520]/65">Periksa pesananmu sebelum melakukan pembayaran.</p>
       </header>
-
-      {orderMessage && <p className="rounded-xl bg-[#C08A57]/15 px-4 py-3 text-sm font-medium text-[#2C2520]">{orderMessage}</p>}
 
       {items.length === 0 ? (
         <div className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-10 text-center">
@@ -136,9 +183,30 @@ export default function CustomerCart() {
             <PaymentMethod selectedMethod={paymentMethod} onChange={setPaymentMethod} />
 
             <button type="button" onClick={handleCheckout} className="mt-5 w-full rounded-xl bg-[#C08A57] py-3 font-bold text-white transition hover:bg-[#a97142]">
-              Buat Pesanan
+              Bayar Sekarang
             </button>
           </aside>
+        </div>
+      )}
+
+      {showReceipt && (
+        <ReceiptModal
+          orderNumber={orderNumber}
+          items={items.map((item) => ({ ...item, qty: item.quantity }))}
+          subtotal={subtotal}
+          tax={tax}
+          total={total}
+          paymentMethod={paymentMethod}
+          onNewOrder={handleNewOrder}
+          onReview={() => setShowReview(true)}
+        />
+      )}
+
+      {showReview && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-[#F4EAE1] p-6 shadow-2xl">
+            <ReviewForm orderNumber={orderNumber} itemNames={items.map((item) => item.name)} onSubmit={handleReviewSubmit} onCancel={() => setShowReview(false)} />
+          </div>
         </div>
       )}
     </section>

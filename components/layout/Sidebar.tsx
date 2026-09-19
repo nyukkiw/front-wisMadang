@@ -5,6 +5,7 @@
 import Link from "next/link";
 
 import { UserRole } from "@/lib/auth";
+import { CartBadge } from "@/components/pelanggan/CartNotification";
 
 interface SidebarProps {
   role: UserRole;
@@ -59,7 +60,7 @@ export default function Sidebar({ role, isOpen, onToggle }: SidebarProps) {
 
         {navigation.links.map((link) => (
           <Link key={link.href} href={link.href} className={linkClass} onClick={() => window.innerWidth < 768 && onToggle()}>
-            <span aria-hidden="true">{link.label}</span>
+            <span aria-hidden="true">{role === "pelanggan" && link.href === "/pelanggan/keranjang" ? <CartBadge /> : link.label}</span>
             <span>{link.text}</span>
           </Link>
         ))}

@@ -9,6 +9,8 @@ interface ReceiptItem {
   price: number;
   qty: number;
   image: string;
+  type?: "menu" | "catering";
+  portions?: number;
 }
 
 interface ReceiptModalProps {
@@ -19,9 +21,10 @@ interface ReceiptModalProps {
   total: number;
   paymentMethod: string;
   onNewOrder: () => void;
+  onReview?: () => void;
 }
 
-export default function ReceiptModal({ orderNumber, items, subtotal, tax, total, paymentMethod, onNewOrder }: ReceiptModalProps) {
+export default function ReceiptModal({ orderNumber, items, subtotal, tax, total, paymentMethod, onNewOrder, onReview }: ReceiptModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       {/* Modal */}
@@ -55,6 +58,8 @@ export default function ReceiptModal({ orderNumber, items, subtotal, tax, total,
                   <p className="text-xs text-gray-500">
                     {item.qty} × Rp {item.price.toLocaleString("id-ID")}
                   </p>
+
+                  {item.type === "catering" && <p className="text-xs text-gray-500">Catering - {item.portions} porsi</p>}
                 </div>
               </div>
 
@@ -91,10 +96,17 @@ export default function ReceiptModal({ orderNumber, items, subtotal, tax, total,
           <span className="font-semibold text-[#2C2520]">{paymentMethod}</span>
         </div>
 
-        {/* Tombol Pesanan Baru */}
-        <button onClick={onNewOrder} className="mt-5 w-full rounded-xl bg-[#C08A57] py-3 font-bold text-white transition hover:bg-[#a97142]">
-          Pesanan Baru
-        </button>
+        <div className="mt-5 space-y-3">
+          {onReview && (
+            <button type="button" onClick={onReview} className="w-full rounded-xl bg-[#E9785F] py-3 font-bold text-white transition hover:bg-[#d85f49]">
+              Beri Ulasan
+            </button>
+          )}
+
+          <button type="button" onClick={onNewOrder} className="w-full rounded-xl bg-[#C08A57] py-3 font-bold text-white transition hover:bg-[#a97142]">
+            Pesanan Baru
+          </button>
+        </div>
       </div>
     </div>
   );

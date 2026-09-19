@@ -2,13 +2,12 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Image from "next/image";
 
 import { dummyCateringPackages } from "@/data/dummyData";
-
-const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
+import { CartToast, CUSTOMER_CART_KEY, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 const ITEMS_PER_PAGE = 4;
 
 type CateringPackage = (typeof dummyCateringPackages)[number];
@@ -29,8 +28,18 @@ export default function CateringList() {
       : [...cart, { ...packageItem, quantity: 1, type: "catering" }];
 
     localStorage.setItem(CUSTOMER_CART_KEY, JSON.stringify(nextCart));
+		notifyCustomerCartUpdated();
     setCartMessage(`${packageItem.name} ditambahkan ke keranjang.`);
   };
+
+  useEffect(() => {
+    if (!cartMessage) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setCartMessage(""), 3200);
+    return () => window.clearTimeout(timeoutId);
+  }, [cartMessage]);
 
   return (
     <section className="space-y-6">
@@ -39,7 +48,7 @@ export default function CateringList() {
         <p className="mt-2 text-[#2C2520]/65">Pilih paket catering untuk keluarga, rapat, atau acara spesial.</p>
       </header>
 
-      {cartMessage && <p className="rounded-xl bg-[#C08A57]/15 px-4 py-3 text-sm font-medium text-[#2C2520]">{cartMessage}</p>}
+      <CartToast message={cartMessage} onClose={() => setCartMessage("")} />
 
       <div className="grid gap-5 md:grid-cols-2">
         {visiblePackages.map((packageItem) => (

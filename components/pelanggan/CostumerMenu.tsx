@@ -2,14 +2,13 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
 import MenuFilter from "@/components/kasir/MenuFilter";
 import SearchMenu from "@/components/kasir/SearchMenu";
 import { dummyCategories, dummyMenus } from "@/data/dummyData";
-
-const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
+import { CartToast, CUSTOMER_CART_KEY, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 
 export default function CostumerMenu() {
 	const [search, setSearch] = useState("");
@@ -37,8 +36,18 @@ export default function CostumerMenu() {
 			: [...cart, { ...menu, quantity: 1, type: "menu" }];
 
 		localStorage.setItem(CUSTOMER_CART_KEY, JSON.stringify(nextCart));
+		notifyCustomerCartUpdated();
 		setCartMessage(`${menu.name} ditambahkan ke keranjang.`);
 	};
+
+	useEffect(() => {
+		if (!cartMessage) {
+			return;
+		}
+
+		const timeoutId = window.setTimeout(() => setCartMessage(""), 3200);
+		return () => window.clearTimeout(timeoutId);
+	}, [cartMessage]);
 
 	return (
 		<section className="space-y-6">
@@ -52,7 +61,7 @@ export default function CostumerMenu() {
 				<MenuFilter categories={dummyCategories} selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
 			</div>
 
-			{cartMessage && <p className="rounded-xl bg-[#C08A57]/15 px-4 py-3 text-sm font-medium text-[#2C2520]">{cartMessage}</p>}
+			<CartToast message={cartMessage} onClose={() => setCartMessage("")} />
 
 			{filteredMenus.length > 0 ? (
 				<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

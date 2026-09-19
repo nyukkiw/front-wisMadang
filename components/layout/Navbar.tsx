@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/auth/AuthProvider";
+import { CartBadge } from "@/components/pelanggan/CartNotification";
 import { UserRole } from "@/lib/auth";
 
 interface NavbarProps {
@@ -60,7 +61,7 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
             </Link>
 
             <Link href="/pelanggan/keranjang" className="text-xl hover:text-[#C08A57]" title="Keranjang">
-              🛒
+              <CartBadge />
             </Link>
 
             <div className="hidden xl:block text-right">
