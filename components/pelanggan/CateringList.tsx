@@ -6,25 +6,26 @@ import { useEffect, useState } from "react";
 
 import Image from "next/image";
 
-import { dummyCateringPackages } from "@/data/dummyData";
 import { CartToast, CUSTOMER_CART_KEY, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
+import { CatalogItem } from "@/lib/menuCatalog";
+import { useMenuCatalog } from "@/lib/useMenuCatalog";
 const ITEMS_PER_PAGE = 4;
-
-type CateringPackage = (typeof dummyCateringPackages)[number];
 
 export default function CateringList() {
   const [page, setPage] = useState(0);
   const [cartMessage, setCartMessage] = useState("");
-  const pageCount = Math.ceil(dummyCateringPackages.length / ITEMS_PER_PAGE);
-  const visiblePackages = dummyCateringPackages.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+  const catalog = useMenuCatalog();
+  const cateringPackages = catalog.filter((item) => item.type === "catering" && typeof item.portions === "number");
+  const pageCount = Math.max(1, Math.ceil(cateringPackages.length / ITEMS_PER_PAGE));
+  const visiblePackages = cateringPackages.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
-  const addToCart = (packageItem: CateringPackage) => {
+  const addToCart = (packageItem: CatalogItem) => {
     const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
-    const cart = savedCart ? JSON.parse(savedCart) : [];
-    const existingItem = cart.find((item: CateringPackage & { quantity: number; type: string }) => item.id === packageItem.id && item.type === "catering");
+    const cart: Array<CatalogItem & { quantity: number }> = savedCart ? JSON.parse(savedCart) : [];
+    const existingItem = cart.find((item) => item.id === packageItem.id && item.type === "catering");
 
     const nextCart = existingItem
-      ? cart.map((item: CateringPackage & { quantity: number; type: string }) => (item.id === packageItem.id && item.type === "catering" ? { ...item, quantity: item.quantity + 1 } : item))
+      ? cart.map((item) => (item.id === packageItem.id && item.type === "catering" ? { ...item, quantity: item.quantity + 1 } : item))
       : [...cart, { ...packageItem, quantity: 1, type: "catering" }];
 
     localStorage.setItem(CUSTOMER_CART_KEY, JSON.stringify(nextCart));
@@ -54,7 +55,7 @@ export default function CateringList() {
         {visiblePackages.map((packageItem) => (
           <article key={packageItem.id} className="overflow-hidden rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] shadow-sm">
             <div className="relative h-48">
-              <Image src={packageItem.image} alt={packageItem.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+              <Image src={packageItem.image} alt={packageItem.name} fill unoptimized={packageItem.image.startsWith("data:")} sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
             </div>
 
             <div className="p-5">

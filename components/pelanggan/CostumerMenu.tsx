@@ -7,24 +7,27 @@ import { useEffect, useMemo, useState } from "react";
 import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
 import MenuFilter from "@/components/kasir/MenuFilter";
 import SearchMenu from "@/components/kasir/SearchMenu";
-import { dummyCategories, dummyMenus } from "@/data/dummyData";
+import { dummyCategories } from "@/data/dummyData";
 import { CartToast, CUSTOMER_CART_KEY, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
+import { useMenuCatalog } from "@/lib/useMenuCatalog";
 
 export default function CostumerMenu() {
 	const [search, setSearch] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState("semua");
 	const [cartMessage, setCartMessage] = useState("");
+	const catalog = useMenuCatalog();
+	const menuItems = catalog.filter((item) => item.type === "menu").map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }));
 
 	const filteredMenus = useMemo(() => {
 		const normalizedSearch = search.trim().toLowerCase();
 
-		return dummyMenus.filter((menu) => {
+		return menuItems.filter((menu) => {
 			const matchesSearch = menu.name.toLowerCase().includes(normalizedSearch) || menu.description.toLowerCase().includes(normalizedSearch);
 			const matchesCategory = selectedCategory === "semua" || menu.category === selectedCategory;
 
 			return matchesSearch && matchesCategory;
 		});
-	}, [search, selectedCategory]);
+	}, [menuItems, search, selectedCategory]);
 
 	const addToCart = (menu: MenuItem) => {
 		const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);

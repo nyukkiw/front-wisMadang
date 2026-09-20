@@ -50,7 +50,7 @@ export default function ReceiptModal({ orderNumber, items, subtotal, tax, total,
           {items.map((item, index) => (
             <div key={`${item.name}-${index}`} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Image src={item.image} alt={item.name} width={32} height={32} className="h-8 w-8 rounded object-cover" />
+                <Image src={item.image} alt={item.name} width={32} height={32} unoptimized={item.image.startsWith("data:")} className="h-8 w-8 rounded object-cover" />
 
                 <div>
                   <p className="text-sm font-medium text-[#2C2520]">{item.name}</p>

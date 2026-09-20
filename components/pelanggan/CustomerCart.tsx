@@ -130,7 +130,7 @@ export default function CustomerCart() {
           <div className="space-y-3">
             {items.map((item) => (
               <article key={`${item.type}-${item.id}`} className="flex gap-4 rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-4 shadow-sm">
-                <Image src={item.image} alt={item.name} width={88} height={88} className="h-22 w-22 rounded-xl object-cover" />
+                <Image src={item.image} alt={item.name} width={88} height={88} unoptimized={item.image.startsWith("data:")} className="h-22 w-22 rounded-xl object-cover" />
 
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-3">

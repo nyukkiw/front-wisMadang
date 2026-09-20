@@ -8,9 +8,9 @@ import { useEffect } from "react";
 import Link from "next/link";
 
 import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
-import { dummyMenus, dummyCateringPackages } from "@/data/dummyData";
 import ReviewForm, { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
 import { CartToast, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
+import { useMenuCatalog } from "@/lib/useMenuCatalog";
 
 const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
 
@@ -19,6 +19,7 @@ export default function CustomerDashboard() {
   const [cartMessage, setCartMessage] = useState("");
   const [reviews, setReviews] = useState<CustomerReview[]>([]);
   const [editingReview, setEditingReview] = useState<CustomerReview | null>(null);
+  const catalog = useMenuCatalog();
 
   useEffect(() => {
     const savedReviews = localStorage.getItem(CUSTOMER_REVIEWS_KEY);
@@ -34,12 +35,16 @@ export default function CustomerDashboard() {
     }
   }, []);
 
-  const popularMenus = dummyMenus.filter((menu) => menu.apakah_laris).slice(0, 4);
+  const popularMenus = catalog
+    .filter((item) => item.type === "menu" && item.apakah_laris)
+    .map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }))
+    .slice(0, 4);
 
   const cateringPerPage = 4;
   const start = cateringPage * cateringPerPage;
 
-  const visibleCatering = dummyCateringPackages.slice(start, start + cateringPerPage);
+  const cateringPackages = catalog.filter((item) => item.type === "catering");
+  const visibleCatering = cateringPackages.slice(start, start + cateringPerPage);
 
   const addToCart = (menu: MenuItem) => {
     const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
@@ -109,7 +114,7 @@ export default function CustomerDashboard() {
               Sebelumnya
             </button>
 
-            <button className="rounded-lg bg-[#C08A57] px-3 py-2 text-sm text-white disabled:opacity-40" disabled={start + cateringPerPage >= dummyCateringPackages.length} onClick={() => setCateringPage((page) => page + 1)}>
+            <button className="rounded-lg bg-[#C08A57] px-3 py-2 text-sm text-white disabled:opacity-40" disabled={start + cateringPerPage >= cateringPackages.length} onClick={() => setCateringPage((page) => page + 1)}>
               Berikutnya
             </button>
           </div>

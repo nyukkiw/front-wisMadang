@@ -4,6 +4,8 @@
 
 import Image from "next/image";
 
+import { normalizeCatalogImage } from "@/lib/menuCatalog";
+
 export interface MenuItem {
   // Interface untuk menu item
   id: number;
@@ -25,6 +27,9 @@ interface MenuCardProps {
 }
 
 export default function MenuCard({ menu, onAdd }: MenuCardProps) {
+  const image = normalizeCatalogImage(menu.image);
+  const isDirectImage = image.startsWith("http://") || image.startsWith("https://") || image.startsWith("data:image/");
+
   // Component MenuCard untuk menampilkan menu item
   return (
     <div
@@ -39,7 +44,11 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
 
       {/* Visual */}
       <div className="relative mb-4 h-32 overflow-hidden rounded-xl bg-[#EAF2ED]">
-        <Image src={menu.image} alt={menu.name} fill sizes="(max-width: 1280px) 33vw, 300px" className="object-cover" />
+        {isDirectImage ? (
+          <img src={image} alt={menu.name} sizes="(max-width: 1280px) 33vw, 300px" className="absolute inset-0 h-full w-full object-cover" />
+        ) : (
+          <Image src={image} alt={menu.name} fill sizes="(max-width: 1280px) 33vw, 300px" className="object-cover" />
+        )}
       </div>
 
       {/* Nama */}

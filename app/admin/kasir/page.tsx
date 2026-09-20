@@ -4,7 +4,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { dummyCategories, dummyMenus } from "@/data/dummyData";
+import { dummyCategories } from "@/data/dummyData";
+import { useMenuCatalog } from "@/lib/useMenuCatalog";
 
 import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
 
@@ -24,6 +25,10 @@ export default function KasirPage() {
   const [search, setSearch] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState("semua");
+  const catalog = useMenuCatalog();
+  const availableMenus = catalog
+    .filter((item) => item.type === "menu")
+    .map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }));
 
   
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -63,14 +68,14 @@ export default function KasirPage() {
   // =========================
 
   const filteredMenus = useMemo(() => {
-    return dummyMenus.filter((menu) => {
+    return availableMenus.filter((menu) => {
       const matchesSearch = menu.name.toLowerCase().includes(search.toLowerCase());
 
       const matchesCategory = selectedCategory === "semua" || menu.category === selectedCategory;
 
       return matchesSearch && matchesCategory;
     });
-  }, [search, selectedCategory]);
+  }, [availableMenus, search, selectedCategory]);
 
   // =========================
   // TAMBAH MENU
@@ -162,7 +167,7 @@ export default function KasirPage() {
     // di keranjang
     const cartIds = cart.map((item) => item.id);
 
-    return dummyMenus.filter((menu) => menu.available && !cartIds.includes(menu.id) && (menu.category === "lauk" || menu.category === "minuman")).slice(0, 2);
+    return availableMenus.filter((menu) => menu.available && !cartIds.includes(menu.id) && (menu.category === "lauk" || menu.category === "minuman")).slice(0, 2);
   }, [cart]);
 
   // =========================
