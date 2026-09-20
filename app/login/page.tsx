@@ -1,6 +1,7 @@
 // File untuk halaman login, menampilkan form login dan informasi akun demo
 
 import LoginForm from "@/components/auth/LoginForm";
+import Image from "next/image";
 
 export default function LoginPage() {
   return (
@@ -8,7 +9,7 @@ export default function LoginPage() {
       <div className="flex min-h-screen items-center justify-center px-6 py-12">
         <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl">
           <div className="mb-8 text-center">
-            <div className="mb-4 text-3xl font-bold text-[#174C4F]">WIS MADANG?</div>
+            <Image src="/IMG Wis Madang/Wis Madang Logo.jpg" alt="Logo WIS MADANG" width={80} height={80} className="mx-auto mb-4 h-20 w-20 rounded-3xl object-cover" priority />
 
             <h1 className="text-2xl font-bold text-gray-900">Masuk ke WIS MADANG</h1>
 

@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!loading && !session) {
-      router.replace("/seller");
+      router.replace("/login"); // Redirect ke halaman login jika tidak ada session 
     }
   }, [loading, router, session]);
 

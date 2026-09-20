@@ -12,6 +12,7 @@ import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
 import ReviewForm, { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
 import { CartToast, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
 
@@ -20,6 +21,7 @@ export default function CustomerDashboard() {
   const [cartMessage, setCartMessage] = useState("");
   const [reviews, setReviews] = useState<CustomerReview[]>([]);
   const [editingReview, setEditingReview] = useState<CustomerReview | null>(null);
+  const { session, openLogin } = useAuth();
   const catalog = useMenuCatalog();
 
   useEffect(() => {
@@ -48,6 +50,11 @@ export default function CustomerDashboard() {
   const visibleCatering = cateringPackages.slice(start, start + cateringPerPage);
 
   const addToCart = (menu: MenuItem) => {
+    if (!session || session.peran !== "pelanggan") {
+      openLogin();
+      return;
+    }
+
     const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
     const cart = savedCart ? JSON.parse(savedCart) : [];
     const existingItem = cart.find((item: MenuItem & { quantity: number; type: string }) => item.id === menu.id && item.type === "menu");
@@ -70,6 +77,11 @@ export default function CustomerDashboard() {
   }, [cartMessage]);
 
   const handleReviewUpdate = ({ rating, comment }: Pick<CustomerReview, "rating" | "comment">) => {
+    if (!session || session.peran !== "pelanggan") {
+      openLogin();
+      return;
+    }
+
     const nextReviews = reviews.map((review) => (review.id === editingReview?.id ? { ...review, rating, comment } : review));
     setReviews(nextReviews);
     localStorage.setItem(CUSTOMER_REVIEWS_KEY, JSON.stringify(nextReviews));
@@ -167,10 +179,32 @@ export default function CustomerDashboard() {
                     <p className="mt-1 text-sm text-[#2C2520]/65">Pesanan {review.orderNumber}</p>
                   </div>
                   <div className="flex gap-3 text-sm font-semibold">
-                    <button type="button" onClick={() => setEditingReview(review)} className="text-[#C08A57] hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!session || session.peran !== "pelanggan") {
+                          openLogin();
+                          return;
+                        }
+
+                        setEditingReview(review);
+                      }}
+                      className="text-[#C08A57] hover:underline"
+                    >
                       Edit
                     </button>
-                    <button type="button" onClick={() => handleReviewDelete(review.id)} className="text-red-600 hover:underline">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!session || session.peran !== "pelanggan") {
+                          openLogin();
+                          return;
+                        }
+
+                        handleReviewDelete(review.id);
+                      }}
+                      className="text-red-600 hover:underline"
+                    >
                       Hapus
                     </button>
                   </div>

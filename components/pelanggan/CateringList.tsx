@@ -9,17 +9,24 @@ import Image from "next/image";
 import { CartToast, CUSTOMER_CART_KEY, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 import { CatalogItem } from "@/lib/menuCatalog";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
+import { useAuth } from "@/components/auth/AuthProvider";
 const ITEMS_PER_PAGE = 4;
 
 export default function CateringList() {
   const [page, setPage] = useState(0);
   const [cartMessage, setCartMessage] = useState("");
+  const { session, openLogin } = useAuth();
   const catalog = useMenuCatalog();
   const cateringPackages = catalog.filter((item) => item.type === "catering" && typeof item.portions === "number");
   const pageCount = Math.max(1, Math.ceil(cateringPackages.length / ITEMS_PER_PAGE));
   const visiblePackages = cateringPackages.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
   const addToCart = (packageItem: CatalogItem) => {
+    if (!session || session.peran !== "pelanggan") {
+      openLogin();
+      return;
+    }
+
     const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
     const cart: Array<CatalogItem & { quantity: number }> = savedCart ? JSON.parse(savedCart) : [];
     const existingItem = cart.find((item) => item.id === packageItem.id && item.type === "catering");

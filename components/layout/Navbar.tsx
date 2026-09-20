@@ -22,12 +22,12 @@ interface NavbarProps {
 
 export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuToggle }: NavbarProps) {
   const router = useRouter();
-  const { logout } = useAuth();
+  const { session, logout } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
 
   const handleLogout = () => {
     logout();
-    router.replace("/seller");
+    router.replace("/login"); // Redirect ke halaman login setelah logout
   };
 
   return (
@@ -57,9 +57,11 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
         {/* PELANGGAN */}
         {role === "pelanggan" && (
           <div className="flex items-center gap-5 text-sm">
-            <Link href="/login" className="hover:text-[#C08A57]">
-              Masuk / Daftar
-            </Link>
+            {!session && (
+              <Link href="/login" className="hover:text-[#C08A57]">
+                Masuk / Daftar
+              </Link>
+            )}
 
             <Link href="/pelanggan/keranjang" className="text-xl hover:text-[#C08A57]" title="Keranjang">
               <CartBadge />

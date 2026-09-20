@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { ShoppingCart } from "lucide-react";
 
+import { useAuth } from "@/components/auth/AuthProvider";
 import PaymentMethod from "@/components/kasir/PaymentMethod"; // Komponen untuk memilih metode pembayaran
 import ReceiptModal from "@/components/kasir/ReceiptModal"; // Komponen modal struk pembayaran
 import ReviewForm, { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
@@ -24,6 +25,7 @@ interface CustomerCartItem {
 }
 
 export default function CustomerCart() {
+  const { session, openLogin } = useAuth();
   const [items, setItems] = useState<CustomerCartItem[]>([]);
   const [cartLoaded, setCartLoaded] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("QRIS");
@@ -71,6 +73,11 @@ export default function CustomerCart() {
 
   const handleCheckout = () => {
     if (items.length === 0) {
+      return;
+    }
+
+    if (!session || session.peran !== "pelanggan") {
+      openLogin();
       return;
     }
 

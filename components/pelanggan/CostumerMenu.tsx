@@ -10,11 +10,13 @@ import SearchMenu from "@/components/kasir/SearchMenu";
 import { dummyCategories } from "@/data/dummyData";
 import { CartToast, CUSTOMER_CART_KEY, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 export default function CostumerMenu() {
 	const [search, setSearch] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState("semua");
 	const [cartMessage, setCartMessage] = useState("");
+	const { session, openLogin } = useAuth();
 	const catalog = useMenuCatalog();
 	const menuItems = catalog.filter((item) => item.type === "menu").map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }));
 
@@ -30,6 +32,11 @@ export default function CostumerMenu() {
 	}, [menuItems, search, selectedCategory]);
 
 	const addToCart = (menu: MenuItem) => {
+		if (!session || session.peran !== "pelanggan") {
+			openLogin();
+			return;
+		}
+
 		const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
 		const cart = savedCart ? JSON.parse(savedCart) : [];
 		const existingItem = cart.find((item: MenuItem & { quantity: number; type: string }) => item.id === menu.id && item.type === "menu");

@@ -21,8 +21,8 @@ export function middleware(request: NextRequest) {
      */
 
     if (!token || !role) {
-      // Jika tidak ada token atau role, redirect ke halaman login seller
-      return NextResponse.redirect(new URL("/seller", request.url));
+      // Jika tidak ada token atau role, redirect ke halaman login umum
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
     /*
@@ -46,20 +46,6 @@ export function middleware(request: NextRequest) {
     if (role === "kasir" && pathname !== "/admin/kasir") {
       // Jika role adalah kasir dan mencoba mengakses halaman selain /admin/kasir, redirect ke /admin/kasir
       return NextResponse.redirect(new URL("/admin/kasir", request.url));
-    }
-  }
-
-  if (pathname.startsWith("/pelanggan")) { // Jika path dimulai dengan /pelanggan, lakukan pengecekan token dan role
-    if (pathname === "/pelanggan/login") {
-      // Jika halaman login pelanggan, biarkan akses tanpa token
-      return NextResponse.next();
-    }
-    if (!token || !role) { // Jika tidak ada token atau role, redirect ke halaman login pelanggan
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    if (role !== "pelanggan") { // Jika role bukan pelanggan, redirect ke halaman utama
-      return NextResponse.redirect(new URL("/seller", request.url));
     }
   }
 

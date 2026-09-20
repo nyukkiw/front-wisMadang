@@ -5,11 +5,15 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 import { Session } from "@/lib/auth";
+import LoginModal from "@/components/auth/LoginModal";
 
 interface AuthContextType {
   session: Session | null;
   login: (session: Session) => void;
   logout: () => void;
+  loginModalOpen: boolean;
+  openLogin: () => void;
+  closeLogin: () => void;
   loading: boolean;
 }
 
@@ -21,6 +25,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
 
   const [loading, setLoading] = useState(true);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [welcomeMessage, setWelcomeMessage] = useState("");
 
   useEffect(() => {
     try {
@@ -54,6 +60,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     document.cookie = `wis_madang_token=${newSession.token}; ` + `path=/; max-age=86400; SameSite=Lax`;
 
     document.cookie = `wis_madang_role=${newSession.peran}; ` + `path=/; max-age=86400; SameSite=Lax`;
+
+    setWelcomeMessage(`Selamat datang di Wis Madang, ${newSession.nama}!`);
+    window.setTimeout(() => setWelcomeMessage(""), 3500);
   };
 
   const logout = () => {
@@ -66,16 +75,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     document.cookie = "wis_madang_role=; path=/; max-age=0";
   };
 
+  const openLogin = () => setLoginModalOpen(true);
+  const closeLogin = () => setLoginModalOpen(false);
+
   return (
     <AuthContext.Provider
       value={{
         session,
         login,
         logout,
+        loginModalOpen,
+        openLogin,
+        closeLogin,
         loading,
       }}
     >
       {children}
+      <LoginModal />
+      {welcomeMessage && (
+        <div className="fixed right-4 top-20 z-50 max-w-sm rounded-xl bg-[#174C4F] px-5 py-4 text-sm font-semibold text-white shadow-xl" role="status">
+          {welcomeMessage}
+        </div>
+      )}
     </AuthContext.Provider>
   );
 }
