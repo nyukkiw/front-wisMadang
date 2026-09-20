@@ -3,6 +3,7 @@
 "use client";
 
 import Image from "next/image";
+import { Sparkles } from "lucide-react";
 import type { MenuItem } from "@/components/kasir/MenuCard";
 
 interface AISuggestionProps {
@@ -21,7 +22,9 @@ export default function AISuggestion({ suggestions, onAdd }: AISuggestionProps) 
     <div className="mt-4 rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-4">
       {/* Header AI */}
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#C08A57] text-lg text-white">✨</div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#C08A57] text-white">
+          <Sparkles className="h-5 w-5" aria-hidden="true" />
+        </div>
 
         <div>
           <h3 className="font-bold text-[#2C2520]">Saran AI</h3>

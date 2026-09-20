@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 
 import Link from "next/link";
+import { Star } from "lucide-react";
 
 import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
 import ReviewForm, { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
@@ -158,12 +159,20 @@ export default function CustomerDashboard() {
               <article key={review.id} className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-bold">{"★".repeat(review.rating)}<span className="text-[#d8c5b5]">{"★".repeat(5 - review.rating)}</span></p>
+                    <div className="flex gap-1" aria-label={`Rating ${review.rating} dari 5`}>
+                      {Array.from({ length: 5 }, (_, index) => (
+                        <Star key={index} className={`h-4 w-4 ${index < review.rating ? "fill-[#E9785F] text-[#E9785F]" : "text-[#d8c5b5]"}`} aria-hidden="true" />
+                      ))}
+                    </div>
                     <p className="mt-1 text-sm text-[#2C2520]/65">Pesanan {review.orderNumber}</p>
                   </div>
                   <div className="flex gap-3 text-sm font-semibold">
-                    <button type="button" onClick={() => setEditingReview(review)} className="text-[#C08A57] hover:underline">Edit</button>
-                    <button type="button" onClick={() => handleReviewDelete(review.id)} className="text-red-600 hover:underline">Hapus</button>
+                    <button type="button" onClick={() => setEditingReview(review)} className="text-[#C08A57] hover:underline">
+                      Edit
+                    </button>
+                    <button type="button" onClick={() => handleReviewDelete(review.id)} className="text-red-600 hover:underline">
+                      Hapus
+                    </button>
                   </div>
                 </div>
                 <p className="mt-3 text-sm">{review.comment || "Tidak ada komentar."}</p>

@@ -3,6 +3,7 @@
 "use client";
 
 import Link from "next/link";
+import { BarChart3, ChefHat, ClipboardList, House, ShoppingCart, Sparkles, Utensils, X, type LucideIcon } from "lucide-react";
 
 import { UserRole } from "@/lib/auth";
 import { CartBadge } from "@/components/pelanggan/CartNotification";
@@ -22,24 +23,24 @@ export default function Sidebar({ role, isOpen, onToggle }: SidebarProps) {
     role === "kasir"
       ? {
           title: "Kasir",
-          links: [{ href: "/admin/kasir", label: "🧾", text: "Transaksi" }],
+          links: [{ href: "/admin/kasir", icon: ClipboardList, text: "Transaksi" }],
         }
       : role === "pelanggan"
         ? {
             title: "Pelanggan",
             links: [
-              { href: "/pelanggan", label: "🏠", text: "Dashboard" },
-              { href: "/pelanggan/menu", label: "🍛", text: "Menu" },
-              { href: "/pelanggan/catering", label: "🍱", text: "Paket Catering" },
-              { href: "/pelanggan/keranjang", label: "🛒", text: "Keranjang" },
+              { href: "/pelanggan", icon: House, text: "Dashboard" },
+              { href: "/pelanggan/menu", icon: Utensils, text: "Menu" },
+              { href: "/pelanggan/catering", icon: ChefHat, text: "Paket Catering" },
+              { href: "/pelanggan/keranjang", icon: ShoppingCart, text: "Keranjang" },
             ],
           }
         : {
             title: "Admin",
             links: [
-              { href: "/admin", label: "📊", text: "Dashboard" },
-              { href: "/admin/menu", label: "🍛", text: "Menu" },
-              { href: "/admin/ai-insight", label: "✨", text: "AI Ulasan" },
+              { href: "/admin", icon: BarChart3, text: "Dashboard" },
+              { href: "/admin/menu", icon: Utensils, text: "Menu" },
+              { href: "/admin/ai-insight", icon: Sparkles, text: "AI Ulasan" },
             ],
           };
 
@@ -54,13 +55,22 @@ export default function Sidebar({ role, isOpen, onToggle }: SidebarProps) {
           <p className="text-xs font-semibold uppercase text-[#2C2520]/60">{navigation.title}</p>
 
           <button onClick={onToggle} className="rounded-lg p-1 text-[#2C2520] hover:bg-[#C08A57]/20 md:hidden" aria-label="Tutup sidebar">
-            ×
+            <X className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
 
         {navigation.links.map((link) => (
           <Link key={link.href} href={link.href} className={linkClass} onClick={() => window.innerWidth < 768 && onToggle()}>
-            <span aria-hidden="true">{role === "pelanggan" && link.href === "/pelanggan/keranjang" ? <CartBadge /> : link.label}</span>
+            <span aria-hidden="true">
+              {role === "pelanggan" && link.href === "/pelanggan/keranjang" ? (
+                <CartBadge showIcon={false} />
+              ) : (
+                (() => {
+                  const Icon = link.icon as LucideIcon;
+                  return <Icon className="h-5 w-5" />;
+                })()
+              )}
+            </span>
             <span>{link.text}</span>
           </Link>
         ))}

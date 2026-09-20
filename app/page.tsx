@@ -9,7 +9,7 @@
 
 //   return (
 //      <div style={{ padding: '40px', fontFamily: 'sans-serif', textAlign: 'center' }}>
-//       <h1>Proyek Fullstack Pertama Kami 🧑‍💻</h1>
+//       <h1>Proyek Fullstack Pertama Kami</h1>
 //       <p style={{ fontSize: '20px', color: 'green', fontWeight: 'bold' }}>
 //         {data.pesan}
 //       </p>

@@ -3,6 +3,7 @@
 "use client";
 
 import Image from "next/image";
+import { Plus, Star } from "lucide-react";
 
 import { normalizeCatalogImage } from "@/lib/menuCatalog";
 
@@ -56,7 +57,7 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
 
       {/* Rating */}
       <div className="mt-1 flex items-center gap-1 text-sm font-semibold text-gray-700">
-        <span className="font-bold text-yellow-500">★</span>
+        <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" aria-hidden="true" />
 
         <span className="font-medium">{menu.rating}</span>
 
@@ -78,7 +79,7 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
             ${menu.available ? "bg-[#C08A57] text-white hover:bg-[#a97142]" : "cursor-not-allowed bg-gray-200 text-gray-400"}
           `}
         >
-          +
+          <Plus className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
 

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import Image from "next/image";
+import { ShoppingCart } from "lucide-react";
 
 import PaymentMethod from "@/components/kasir/PaymentMethod"; // Komponen untuk memilih metode pembayaran
 import ReceiptModal from "@/components/kasir/ReceiptModal"; // Komponen modal struk pembayaran
@@ -87,7 +88,8 @@ export default function CustomerCart() {
     setOrderNumber("");
   };
 
-  const handleReviewSubmit = ({ rating, comment }: Pick<CustomerReview, "rating" | "comment">) => { // event handler untuk submit ulasan pelanggan
+  const handleReviewSubmit = ({ rating, comment }: Pick<CustomerReview, "rating" | "comment">) => {
+    // event handler untuk submit ulasan pelanggan
     const savedReviews = localStorage.getItem(CUSTOMER_REVIEWS_KEY);
     let reviews: CustomerReview[] = [];
 
@@ -99,7 +101,8 @@ export default function CustomerCart() {
       }
     }
 
-    const review: CustomerReview = { // membuat objek ulasan baru dengan informasi yang diberikan
+    const review: CustomerReview = {
+      // membuat objek ulasan baru dengan informasi yang diberikan
       id: `${orderNumber}-${Date.now()}`,
       orderNumber,
       itemNames: items.map((item) => item.name),
@@ -121,7 +124,7 @@ export default function CustomerCart() {
 
       {items.length === 0 ? (
         <div className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-10 text-center">
-          <p className="text-4xl">🛒</p>
+          <ShoppingCart className="mx-auto h-10 w-10 text-[#C08A57]" aria-hidden="true" />
           <h2 className="mt-3 font-bold text-[#2C2520]">Keranjang masih kosong</h2>
           <p className="mt-1 text-sm text-[#2C2520]/65">Tambahkan menu atau paket catering terlebih dahulu.</p>
         </div>

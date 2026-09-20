@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Search } from "lucide-react";
 
 import { dummyCategories } from "@/data/dummyData";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
@@ -30,7 +31,6 @@ export default function KasirPage() {
     .filter((item) => item.type === "menu")
     .map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }));
 
-  
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartLoaded, setCartLoaded] = useState(false); // Menandai apakah keranjang sudah dimuat dari localStorage
   useEffect(() => {
@@ -262,7 +262,7 @@ export default function KasirPage() {
             {/* Tidak ditemukan */}
             {filteredMenus.length === 0 && (
               <div className="mt-6 rounded-2xl bg-[#e6efe9] p-10 text-center">
-                <div className="text-4xl">🔍</div>
+                <Search className="mx-auto h-10 w-10 text-[#174a43]" aria-hidden="true" />
 
                 <p className="mt-3 font-semibold text-[#174a43]">Menu tidak ditemukan</p>
 

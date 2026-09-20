@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Check, ShoppingCart, X } from "lucide-react";
 
 export const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
 export const CUSTOMER_CART_UPDATED_EVENT = "wis-madang-cart-updated";
@@ -48,7 +49,7 @@ export function CartBadge({ showIcon = true }: CartBadgeProps) {
 
   return (
     <span className="relative inline-flex items-center">
-      {showIcon && <span aria-hidden="true">🛒</span>}
+      {showIcon && <ShoppingCart className="h-5 w-5" aria-hidden="true" />}
       {count > 0 && (
         <span className="absolute -right-3 -top-3 flex min-h-5 min-w-5 items-center justify-center rounded-full border-2 border-white bg-[#E03E3E] px-1 text-[10px] font-bold leading-none text-white shadow-md">
           {count > 99 ? "99+" : count}
@@ -72,14 +73,14 @@ export function CartToast({ message, onClose }: CartToastProps) {
     <div className="fixed bottom-5 right-5 z-50 w-[min(20rem,calc(100vw-2rem))] max-w-sm animate-[cart-toast-in_220ms_ease-out] rounded-2xl border border-[#E9785F]/40 bg-[#174a43] p-4 text-white shadow-2xl" role="status" aria-live="polite">
       <div className="flex items-start gap-3">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#E9785F] text-lg" aria-hidden="true">
-          ✓
+          <Check className="h-5 w-5" aria-hidden="true" />
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-[#F4C6A5]">Masuk ke keranjang</p>
           <p className="mt-1 truncate text-sm font-bold">{message}</p>
         </div>
         <button type="button" onClick={onClose} className="text-lg leading-none text-white/70 hover:text-white" aria-label="Tutup notifikasi">
-          ×
+          <X className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
     </div>

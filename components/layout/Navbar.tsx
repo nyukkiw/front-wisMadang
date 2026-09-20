@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown, ChevronLeft, Menu, Phone, UserCircle } from "lucide-react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -37,7 +38,7 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
         ========================= */}
         <div className="flex items-center gap-3">
           <button onClick={onMenuToggle} className="rounded-lg p-2 text-xl hover:bg-[#C08A57]" aria-label={sidebarOpen ? "Tutup sidebar" : "Buka sidebar"}>
-            {sidebarOpen ? "‹" : "☰"}
+            {sidebarOpen ? <ChevronLeft className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </button>
 
           <Image src="/IMG Wis Madang/Wis Madang Logo.jpg" alt="Logo WIS MADANG" width={42} height={42} className="h-10 w-10 rounded-xl object-cover" priority />
@@ -65,7 +66,10 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
             </Link>
 
             <div className="hidden xl:block text-right">
-              <p>☎ 0812-3456-7890</p>
+              <p className="flex items-center justify-end gap-1">
+                <Phone className="h-3.5 w-3.5" aria-hidden="true" />
+                0812-3456-7890
+              </p>
               <p className="text-xs text-white/70">Jl. Contoh No. 123, Yogyakarta</p>
             </div>
 
@@ -77,7 +81,9 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
         {(role === "kasir" || role === "admin") && (
           <div className="relative">
             <button onClick={() => setShowProfile(!showProfile)} className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-[#C08A57]">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4EAE1] text-[#2C2520]">👤</div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4EAE1] text-[#2C2520]">
+                <UserCircle className="h-5 w-5" aria-hidden="true" />
+              </div>
 
               <div className="hidden text-left sm:block">
                 <p className="text-sm font-semibold">{nama}</p>
@@ -85,7 +91,7 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
                 <p className="text-xs text-white/60 capitalize">{role}</p>
               </div>
 
-              <span>⌄</span>
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
             </button>
 
             {/* DROPDOWN */}

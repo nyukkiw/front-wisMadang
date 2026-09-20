@@ -3,6 +3,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { Star } from "lucide-react";
 
 export const CUSTOMER_REVIEWS_KEY = "wis-madang-customer-reviews";
 
@@ -45,7 +46,7 @@ export default function ReviewForm({ orderNumber, itemNames = [], initialReview,
         <div className="flex gap-2" aria-label="Pilih rating">
           {[1, 2, 3, 4, 5].map((value) => (
             <button key={value} type="button" aria-label={`${value} bintang`} aria-pressed={rating === value} onClick={() => setRating(value)} className={`text-3xl transition ${value <= rating ? "text-[#E9785F]" : "text-[#d8c5b5]"}`}>
-              ★
+              <Star className={`h-8 w-8 ${value <= rating ? "fill-[#E9785F] text-[#E9785F]" : "text-[#d8c5b5]"}`} aria-hidden="true" />
             </button>
           ))}
         </div>

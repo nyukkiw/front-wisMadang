@@ -3,6 +3,7 @@
 "use client";
 
 import Image from "next/image";
+import { CheckCircle2 } from "lucide-react";
 
 interface ReceiptItem {
   name: string;
@@ -31,7 +32,9 @@ export default function ReceiptModal({ orderNumber, items, subtotal, tax, total,
       <div className="w-full max-w-md rounded-2xl bg-[#F4EAE1] p-6 shadow-2xl">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#C08A57]/20 text-2xl text-[#C08A57]">✓</div>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#C08A57]/20 text-[#C08A57]">
+            <CheckCircle2 className="h-8 w-8" aria-hidden="true" />
+          </div>
 
           <h2 className="mt-3 text-xl font-bold text-[#2C2520]">Pembayaran Berhasil</h2>
 

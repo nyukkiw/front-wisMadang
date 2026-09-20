@@ -2,6 +2,8 @@
 
 "use client";
 
+import { Search } from "lucide-react";
+
 interface SearchMenuProps {
   value: string;
   onChange: (value: string) => void;
@@ -10,7 +12,7 @@ interface SearchMenuProps {
 export default function SearchMenu({ value, onChange }: SearchMenuProps) {
   return (
     <div className="relative">
-      <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+      <Search className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} aria-hidden="true" />
 
       <input
         type="text"

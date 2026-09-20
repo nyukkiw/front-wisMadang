@@ -5,6 +5,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 
 import Image from "next/image";
+import { X } from "lucide-react";
 
 import { CatalogItem, CatalogItemType, defaultCatalog, FALLBACK_IMAGE, getNextCatalogId, MENU_CATALOG_KEY, normalizeCatalogImage } from "@/lib/menuCatalog";
 
@@ -237,13 +238,26 @@ export default function MenuManagement() {
               </div>
               <p className="mt-3 min-h-10 text-sm text-[#2C2520]/65">{item.description}</p>
               <div className="mt-5 flex gap-2 border-t border-[#e2d3c5] pt-4">
-                <button type="button" onClick={() => openEditForm(item)} className="flex-1 rounded-lg border border-[#C08A57] px-3 py-2 text-sm font-bold text-[#C08A57] transition-colors hover:bg-[#C08A57] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C08A57]/50">
+                <button
+                  type="button"
+                  onClick={() => openEditForm(item)}
+                  className="flex-1 rounded-lg border border-[#C08A57] px-3 py-2 text-sm font-bold text-[#C08A57] transition-colors hover:bg-[#C08A57] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C08A57]/50"
+                >
                   Edit
                 </button>
-                <button type="button" onClick={() => toggleAvailability(item.id)} className="flex-1 rounded-lg bg-[#174a43] px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-[#123c36] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#174a43]/50">
+                <button
+                  type="button"
+                  onClick={() => toggleAvailability(item.id)}
+                  className="flex-1 rounded-lg bg-[#174a43] px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-[#123c36] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#174a43]/50"
+                >
                   {item.available ? "Nonaktifkan" : "Aktifkan"}
                 </button>
-                <button type="button" onClick={() => handleDelete(item.id)} aria-label={`Hapus ${item.name}`} className="rounded-lg bg-red-50 px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/50">
+                <button
+                  type="button"
+                  onClick={() => handleDelete(item.id)}
+                  aria-label={`Hapus ${item.name}`}
+                  className="rounded-lg bg-red-50 px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600/50"
+                >
                   Hapus
                 </button>
               </div>
@@ -268,7 +282,7 @@ export default function MenuManagement() {
                 <h2 className="mt-1 text-2xl font-bold">{editingId === null ? "Tambah ke katalog" : "Edit produk"}</h2>
               </div>
               <button type="button" onClick={() => setShowForm(false)} className="text-2xl text-[#2C2520]/60" aria-label="Tutup form">
-                ×
+                <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
             <div className="mt-6 grid gap-4 md:grid-cols-2">

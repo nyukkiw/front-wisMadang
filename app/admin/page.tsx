@@ -1,3 +1,5 @@
+import { Star } from "lucide-react";
+
 // File untuk halaman dashboard admin, menampilkan ringkasan bisnis WIS MADANG
 
 export default function AdminDashboard() {
@@ -23,7 +25,10 @@ export default function AdminDashboard() {
         <div className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-6 shadow-sm">
           <p className="text-sm text-[#2C2520]/65">Customer Rating</p>
 
-          <h2 className="mt-2 text-2xl font-bold">★ 4.8</h2>
+          <h2 className="mt-2 flex items-center gap-1 text-2xl font-bold">
+            <Star className="h-6 w-6 fill-[#E9785F] text-[#E9785F]" aria-hidden="true" />
+            4.8
+          </h2>
         </div>
       </div>
     </div>

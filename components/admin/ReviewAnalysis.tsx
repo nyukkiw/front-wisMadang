@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { MessageCircle, Sparkles, Star } from "lucide-react";
 
 import { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
 
@@ -74,9 +75,7 @@ export default function ReviewAnalysis() {
     const positive = reviews.filter((review) => getSentiment(review) === "Positif").length;
     const needsAttention = reviews.filter((review) => getSentiment(review) === "Perlu perhatian").length;
     const topicWords = ["rasa", "porsi", "pelayanan", "waktu", "minuman"];
-    const topTopic = topicWords
-      .map((topic) => ({ topic, count: reviews.filter((review) => review.comment.toLowerCase().includes(topic)).length }))
-      .sort((first, second) => second.count - first.count)[0];
+    const topTopic = topicWords.map((topic) => ({ topic, count: reviews.filter((review) => review.comment.toLowerCase().includes(topic)).length })).sort((first, second) => second.count - first.count)[0];
 
     return { average: average.toFixed(1), positive, needsAttention, topTopic: topTopic.count > 0 ? topTopic.topic : "Kualitas menu" };
   }, [reviews]);
@@ -100,7 +99,10 @@ export default function ReviewAnalysis() {
           <p className="mt-2 max-w-2xl text-[#2C2520]/65">Pantau ulasan yang masuk dan dapatkan rangkuman otomatis untuk membantu menentukan prioritas perbaikan.</p>
         </div>
         <button type="button" onClick={loadSimulation} className="rounded-xl bg-[#174C4F] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#103d3f]">
-          ✨ Muat simulasi AI
+          <span className="inline-flex items-center gap-2">
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
+            Muat simulasi AI
+          </span>
         </button>
       </header>
 
@@ -109,7 +111,7 @@ export default function ReviewAnalysis() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
           ["Total ulasan", reviews.length.toString(), "ulasan masuk"],
-          ["Rating rata-rata", `★ ${summary.average}`, "dari 5 bintang"],
+          ["Rating rata-rata", summary.average, "dari 5 bintang"],
           ["Sentimen positif", `${summary.positive}`, "ulasan positif"],
           ["Topik utama", summary.topTopic, "paling sering dibahas"],
         ].map(([label, value, detail]) => (
@@ -128,7 +130,11 @@ export default function ReviewAnalysis() {
               <h2 className="text-lg font-bold text-[#2C2520]">Ulasan terbaru</h2>
               <p className="mt-1 text-sm text-[#2C2520]/60">Klik filter untuk memprioritaskan respons admin.</p>
             </div>
-            <select value={filter} onChange={(event) => setFilter(event.target.value as "Semua" | Sentiment)} className="rounded-lg border border-[#e2d3c5] bg-[#FCF9F6] px-3 py-2 text-sm text-[#2C2520] outline-none focus:ring-2 focus:ring-[#C08A57]/40">
+            <select
+              value={filter}
+              onChange={(event) => setFilter(event.target.value as "Semua" | Sentiment)}
+              className="rounded-lg border border-[#e2d3c5] bg-[#FCF9F6] px-3 py-2 text-sm text-[#2C2520] outline-none focus:ring-2 focus:ring-[#C08A57]/40"
+            >
               <option>Semua</option>
               <option>Positif</option>
               <option>Netral</option>
@@ -138,7 +144,7 @@ export default function ReviewAnalysis() {
 
           {filteredReviews.length === 0 ? (
             <div className="mt-6 rounded-xl border border-dashed border-[#C08A57]/50 bg-[#FCF9F6] p-8 text-center">
-              <p className="text-3xl">💬</p>
+              <MessageCircle className="mx-auto h-9 w-9 text-[#C08A57]" aria-hidden="true" />
               <p className="mt-2 font-semibold text-[#2C2520]">Belum ada ulasan untuk ditampilkan</p>
               <p className="mt-1 text-sm text-[#2C2520]/60">Gunakan simulasi AI untuk mencoba alur analisis.</p>
             </div>
@@ -151,12 +157,22 @@ export default function ReviewAnalysis() {
                     <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
                       <div>
                         <p className="font-semibold text-[#2C2520]">{review.itemNames.join(", ")}</p>
-                        <p className="mt-1 text-xs text-[#2C2520]/55">{review.orderNumber} · {formatDate(review.createdAt)}</p>
+                        <p className="mt-1 text-xs text-[#2C2520]/55">
+                          {review.orderNumber} · {formatDate(review.createdAt)}
+                        </p>
                       </div>
-                      <span className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${sentiment === "Positif" ? "bg-[#dcefe7] text-[#27664e]" : sentiment === "Netral" ? "bg-[#fff1d8] text-[#946b2c]" : "bg-[#fde2dc] text-[#a5483b]"}`}>{sentiment}</span>
+                      <span
+                        className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${sentiment === "Positif" ? "bg-[#dcefe7] text-[#27664e]" : sentiment === "Netral" ? "bg-[#fff1d8] text-[#946b2c]" : "bg-[#fde2dc] text-[#a5483b]"}`}
+                      >
+                        {sentiment}
+                      </span>
                     </div>
                     <p className="mt-3 text-sm leading-6 text-[#2C2520]/80">{review.comment || "Tidak ada komentar tertulis."}</p>
-                    <p className="mt-3 text-sm tracking-wide text-[#E9785F]">{"★".repeat(review.rating)}<span className="text-[#d8c5b5]">{"★".repeat(5 - review.rating)}</span></p>
+                    <div className="mt-3 flex gap-1" aria-label={`Rating ${review.rating} dari 5`}>
+                      {Array.from({ length: 5 }, (_, index) => (
+                        <Star key={index} className={`h-4 w-4 ${index < review.rating ? "fill-[#E9785F] text-[#E9785F]" : "text-[#d8c5b5]"}`} aria-hidden="true" />
+                      ))}
+                    </div>
                   </article>
                 );
               })}
@@ -166,16 +182,25 @@ export default function ReviewAnalysis() {
 
         <aside className="h-fit rounded-2xl bg-[#174C4F] p-5 text-white shadow-sm">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E9785F] text-lg">✦</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E9785F]">
+              <Sparkles className="h-5 w-5" aria-hidden="true" />
+            </span>
             <div>
               <h2 className="font-bold">Insight AI</h2>
               <p className="text-xs text-white/65">Simulasi berbasis rating dan kata kunci</p>
             </div>
           </div>
           <div className="mt-6 space-y-4 text-sm leading-6 text-white/80">
-            <p><strong className="text-white">Ringkasan:</strong> {summary.positive > summary.needsAttention ? "Pelanggan cenderung puas dengan pengalaman makan." : "Ada beberapa ulasan yang perlu segera ditindaklanjuti."}</p>
-            <p><strong className="text-white">Sinyal utama:</strong> Topik “{summary.topTopic}” paling sering muncul dalam ulasan yang dianalisis.</p>
-            <p><strong className="text-white">Saran aksi:</strong> {summary.needsAttention > 0 ? "Tinjau ulasan dengan sentimen perlu perhatian dan siapkan respons pelanggan." : "Pertahankan kualitas menu dan minta pelanggan memberikan ulasan setelah transaksi."}</p>
+            <p>
+              <strong className="text-white">Ringkasan:</strong> {summary.positive > summary.needsAttention ? "Pelanggan cenderung puas dengan pengalaman makan." : "Ada beberapa ulasan yang perlu segera ditindaklanjuti."}
+            </p>
+            <p>
+              <strong className="text-white">Sinyal utama:</strong> Topik “{summary.topTopic}” paling sering muncul dalam ulasan yang dianalisis.
+            </p>
+            <p>
+              <strong className="text-white">Saran aksi:</strong>{" "}
+              {summary.needsAttention > 0 ? "Tinjau ulasan dengan sentimen perlu perhatian dan siapkan respons pelanggan." : "Pertahankan kualitas menu dan minta pelanggan memberikan ulasan setelah transaksi."}
+            </p>
           </div>
           <div className="mt-6 border-t border-white/15 pt-4 text-xs text-white/55">Insight ini adalah simulasi lokal, bukan hasil model AI eksternal.</div>
         </aside>
