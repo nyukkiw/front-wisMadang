@@ -20,11 +20,12 @@ interface ReviewFormProps {
   orderNumber?: string;
   itemNames?: string[];
   initialReview?: CustomerReview;
+  isDraft?: boolean;
   onSubmit: (review: Pick<CustomerReview, "rating" | "comment">) => void;
   onCancel?: () => void;
 }
 
-export default function ReviewForm({ orderNumber, itemNames = [], initialReview, onSubmit, onCancel }: ReviewFormProps) {
+export default function ReviewForm({ orderNumber, itemNames = [], initialReview, isDraft = false, onSubmit, onCancel }: ReviewFormProps) {
   const [rating, setRating] = useState(initialReview?.rating ?? 5);
   const [comment, setComment] = useState(initialReview?.comment ?? "");
 
@@ -36,7 +37,7 @@ export default function ReviewForm({ orderNumber, itemNames = [], initialReview,
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <h2 className="text-lg font-bold text-[#2C2520]">{initialReview ? "Edit ulasan" : "Bagikan pengalamanmu"}</h2>
+        <h2 className="text-lg font-bold text-[#2C2520]">{initialReview && !isDraft ? "Edit ulasan" : "Bagikan pengalamanmu"}</h2>
         {!initialReview && orderNumber && <p className="mt-1 text-sm text-[#2C2520]/65">Pesanan {orderNumber}</p>}
         {!initialReview && itemNames.length > 0 && <p className="mt-1 text-sm text-[#2C2520]/65">{itemNames.join(", ")}</p>}
       </div>
@@ -71,7 +72,7 @@ export default function ReviewForm({ orderNumber, itemNames = [], initialReview,
           </button>
         )}
         <button type="submit" className="flex-1 rounded-xl bg-[#C08A57] px-4 py-3 font-bold text-white transition hover:bg-[#a97142]">
-          {initialReview ? "Simpan perubahan" : "Kirim ulasan"}
+          {initialReview && !isDraft ? "Simpan perubahan" : "Kirim ulasan"}
         </button>
       </div>
     </form>

@@ -292,7 +292,7 @@ export default function KasirPage() {
           STRUK DIGITAL
       ========================= */}
 
-      {showReceipt && <ReceiptModal orderNumber={orderNumber} items={cart} subtotal={subtotal} tax={tax} total={total} paymentMethod={paymentMethod} onNewOrder={handleNewOrder} />}
+      {showReceipt && <ReceiptModal orderNumber={orderNumber} items={cart} subtotal={subtotal} tax={tax} total={total} paymentMethod={paymentMethod} onClose={handleNewOrder} />}
     </main>
   );
 }

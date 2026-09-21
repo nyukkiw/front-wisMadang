@@ -21,11 +21,10 @@ interface ReceiptModalProps {
   tax: number;
   total: number;
   paymentMethod: string;
-  onNewOrder: () => void;
-  onReview?: () => void;
+  onClose: () => void;
 }
 
-export default function ReceiptModal({ orderNumber, items, subtotal, tax, total, paymentMethod, onNewOrder, onReview }: ReceiptModalProps) {
+export default function ReceiptModal({ orderNumber, items, subtotal, tax, total, paymentMethod, onClose }: ReceiptModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       {/* Modal */}
@@ -100,14 +99,8 @@ export default function ReceiptModal({ orderNumber, items, subtotal, tax, total,
         </div>
 
         <div className="mt-5 space-y-3">
-          {onReview && (
-            <button type="button" onClick={onReview} className="w-full rounded-xl bg-[#E9785F] py-3 font-bold text-white transition hover:bg-[#d85f49]">
-              Beri Ulasan
-            </button>
-          )}
-
-          <button type="button" onClick={onNewOrder} className="w-full rounded-xl bg-[#C08A57] py-3 font-bold text-white transition hover:bg-[#a97142]">
-            Pesanan Baru
+          <button type="button" onClick={onClose} className="w-full rounded-xl bg-[#C08A57] py-3 font-bold text-white transition hover:bg-[#a97142]">
+            Tutup
           </button>
         </div>
       </div>

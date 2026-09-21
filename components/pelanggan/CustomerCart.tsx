@@ -8,7 +8,6 @@ import { ShoppingCart } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import PaymentMethod from "@/components/kasir/PaymentMethod"; // Komponen untuk memilih metode pembayaran
 import ReceiptModal from "@/components/kasir/ReceiptModal"; // Komponen modal struk pembayaran
-import ReviewForm, { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
 import { notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 
 const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
@@ -30,7 +29,6 @@ export default function CustomerCart() {
   const [cartLoaded, setCartLoaded] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("QRIS");
   const [showReceipt, setShowReceipt] = useState(false);
-  const [showReview, setShowReview] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
 
   useEffect(() => {
@@ -90,36 +88,8 @@ export default function CustomerCart() {
   const handleNewOrder = () => {
     setItems([]);
     setPaymentMethod("QRIS");
-    setShowReview(false);
     setShowReceipt(false);
     setOrderNumber("");
-  };
-
-  const handleReviewSubmit = ({ rating, comment }: Pick<CustomerReview, "rating" | "comment">) => {
-    // event handler untuk submit ulasan pelanggan
-    const savedReviews = localStorage.getItem(CUSTOMER_REVIEWS_KEY);
-    let reviews: CustomerReview[] = [];
-
-    if (savedReviews) {
-      try {
-        reviews = JSON.parse(savedReviews);
-      } catch {
-        localStorage.removeItem(CUSTOMER_REVIEWS_KEY);
-      }
-    }
-
-    const review: CustomerReview = {
-      // membuat objek ulasan baru dengan informasi yang diberikan
-      id: `${orderNumber}-${Date.now()}`,
-      orderNumber,
-      itemNames: items.map((item) => item.name),
-      rating,
-      comment,
-      createdAt: new Date().toISOString(),
-    };
-
-    localStorage.setItem(CUSTOMER_REVIEWS_KEY, JSON.stringify([review, ...reviews])); // menyimpan ulasan baru ke localStorage, menambahkan di awal array ulasan yang sudah ada
-    setShowReview(false);
   };
 
   return (
@@ -199,26 +169,7 @@ export default function CustomerCart() {
         </div>
       )}
 
-      {showReceipt && (
-        <ReceiptModal
-          orderNumber={orderNumber}
-          items={items.map((item) => ({ ...item, qty: item.quantity }))}
-          subtotal={subtotal}
-          tax={tax}
-          total={total}
-          paymentMethod={paymentMethod}
-          onNewOrder={handleNewOrder}
-          onReview={() => setShowReview(true)}
-        />
-      )}
-
-      {showReview && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-[#F4EAE1] p-6 shadow-2xl">
-            <ReviewForm orderNumber={orderNumber} itemNames={items.map((item) => item.name)} onSubmit={handleReviewSubmit} onCancel={() => setShowReview(false)} />
-          </div>
-        </div>
-      )}
+      {showReceipt && <ReceiptModal orderNumber={orderNumber} items={items.map((item) => ({ ...item, qty: item.quantity }))} subtotal={subtotal} tax={tax} total={total} paymentMethod={paymentMethod} onClose={handleNewOrder} />}
     </section>
   );
 }

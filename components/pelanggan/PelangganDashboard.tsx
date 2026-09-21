@@ -6,10 +6,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 
 import Link from "next/link";
-import { Star } from "lucide-react";
-
 import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
-import ReviewForm, { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
 import { CartToast, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -19,24 +16,8 @@ const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
 export default function CustomerDashboard() {
   const [cateringPage, setCateringPage] = useState(0);
   const [cartMessage, setCartMessage] = useState("");
-  const [reviews, setReviews] = useState<CustomerReview[]>([]);
-  const [editingReview, setEditingReview] = useState<CustomerReview | null>(null);
   const { session, openLogin } = useAuth();
   const catalog = useMenuCatalog();
-
-  useEffect(() => {
-    const savedReviews = localStorage.getItem(CUSTOMER_REVIEWS_KEY);
-
-    if (!savedReviews) {
-      return;
-    }
-
-    try {
-      setReviews(JSON.parse(savedReviews));
-    } catch {
-      localStorage.removeItem(CUSTOMER_REVIEWS_KEY);
-    }
-  }, []);
 
   const popularMenus = catalog
     .filter((item) => item.type === "menu" && item.apakah_laris)
@@ -75,24 +56,6 @@ export default function CustomerDashboard() {
     const timeoutId = window.setTimeout(() => setCartMessage(""), 3200);
     return () => window.clearTimeout(timeoutId);
   }, [cartMessage]);
-
-  const handleReviewUpdate = ({ rating, comment }: Pick<CustomerReview, "rating" | "comment">) => {
-    if (!session || session.peran !== "pelanggan") {
-      openLogin();
-      return;
-    }
-
-    const nextReviews = reviews.map((review) => (review.id === editingReview?.id ? { ...review, rating, comment } : review));
-    setReviews(nextReviews);
-    localStorage.setItem(CUSTOMER_REVIEWS_KEY, JSON.stringify(nextReviews));
-    setEditingReview(null);
-  };
-
-  const handleReviewDelete = (id: string) => {
-    const nextReviews = reviews.filter((review) => review.id !== id);
-    setReviews(nextReviews);
-    localStorage.setItem(CUSTOMER_REVIEWS_KEY, JSON.stringify(nextReviews));
-  };
 
   return (
     <div className="space-y-10">
@@ -153,69 +116,6 @@ export default function CustomerDashboard() {
         {/* PromoCard */}
       </section>
 
-      <section>
-        <h2 className="text-xl font-bold">Ulasan Pelanggan</h2>
-
-        {editingReview ? (
-          <div className="mt-4 max-w-xl rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-5">
-            <ReviewForm initialReview={editingReview} onSubmit={handleReviewUpdate} onCancel={() => setEditingReview(null)} />
-          </div>
-        ) : reviews.length === 0 ? (
-          <div className="mt-4 rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-5">
-            <p className="font-semibold">Belum ada ulasan</p>
-            <p className="mt-1 text-sm text-[#2C2520]/65">Ulasanmu akan muncul di sini setelah transaksi selesai.</p>
-          </div>
-        ) : (
-          <div className="mt-4 space-y-3">
-            {reviews.map((review) => (
-              <article key={review.id} className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex gap-1" aria-label={`Rating ${review.rating} dari 5`}>
-                      {Array.from({ length: 5 }, (_, index) => (
-                        <Star key={index} className={`h-4 w-4 ${index < review.rating ? "fill-[#E9785F] text-[#E9785F]" : "text-[#d8c5b5]"}`} aria-hidden="true" />
-                      ))}
-                    </div>
-                    <p className="mt-1 text-sm text-[#2C2520]/65">Pesanan {review.orderNumber}</p>
-                  </div>
-                  <div className="flex gap-3 text-sm font-semibold">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!session || session.peran !== "pelanggan") {
-                          openLogin();
-                          return;
-                        }
-
-                        setEditingReview(review);
-                      }}
-                      className="text-[#C08A57] hover:underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!session || session.peran !== "pelanggan") {
-                          openLogin();
-                          return;
-                        }
-
-                        handleReviewDelete(review.id);
-                      }}
-                      className="text-red-600 hover:underline"
-                    >
-                      Hapus
-                    </button>
-                  </div>
-                </div>
-                <p className="mt-3 text-sm">{review.comment || "Tidak ada komentar."}</p>
-                <p className="mt-2 text-xs text-[#2C2520]/60">{review.itemNames.join(", ")}</p>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
     </div>
   );
 }

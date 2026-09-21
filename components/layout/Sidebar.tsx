@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { BarChart3, ChefHat, ClipboardList, House, LogOut, Sparkles, Utensils, X, type LucideIcon } from "lucide-react";
+import { BarChart3, ChefHat, ClipboardList, House, LogOut, MessageCircle, Sparkles, Utensils, X, type LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -35,6 +35,7 @@ export default function Sidebar({ role, isOpen, onToggle }: SidebarProps) {
               { href: "/pelanggan", icon: House, text: "Dashboard" },
               { href: "/pelanggan/menu", icon: Utensils, text: "Menu" },
               { href: "/pelanggan/catering", icon: ChefHat, text: "Paket Catering" },
+              { href: "/pelanggan/ulasan", icon: MessageCircle, text: "Ulasan" },
             ],
           }
         : {
