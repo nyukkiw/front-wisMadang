@@ -37,9 +37,17 @@ const simulatedReviews: CustomerReview[] = [
 type Sentiment = "Positif" | "Netral" | "Perlu perhatian";
 
 function getSentiment(review: CustomerReview): Sentiment {
-  if (review.rating >= 4) return "Positif";
+  if (review.rating >= 3) return "Positif";
   if (review.rating <= 2) return "Perlu perhatian";
   return "Netral";
+}
+
+interface MenuReviewSummary {
+  name: string;
+  reviewCount: number;
+  averageRating: number;
+  positivePercentage: number;
+  poorPercentage: number;
 }
 
 function formatDate(date: string) {
@@ -79,6 +87,42 @@ export default function ReviewAnalysis() {
 
     return { average: average.toFixed(1), positive, needsAttention, topTopic: topTopic.count > 0 ? topTopic.topic : "Kualitas menu" };
   }, [reviews]);
+
+  const menuSummaries = useMemo(() => {
+    const menuReviews = new Map<string, CustomerReview[]>();
+
+    reviews.forEach((review) => {
+      review.itemNames.forEach((itemName) => {
+        const name = itemName.trim();
+
+        if (!name) {
+          return;
+        }
+
+        const existingReviews = menuReviews.get(name) ?? [];
+        menuReviews.set(name, [...existingReviews, review]);
+      });
+    });
+
+    return Array.from(menuReviews.entries())
+      .map(([name, itemReviews]): MenuReviewSummary => {
+        const positiveCount = itemReviews.filter((review) => review.rating >= 3).length;
+        const poorCount = itemReviews.filter((review) => review.rating <= 2).length;
+        const averageRating = itemReviews.reduce((total, review) => total + review.rating, 0) / itemReviews.length;
+
+        return {
+          name,
+          reviewCount: itemReviews.length,
+          averageRating,
+          positivePercentage: (positiveCount / itemReviews.length) * 100,
+          poorPercentage: (poorCount / itemReviews.length) * 100,
+        };
+      })
+      .sort((first, second) => second.averageRating - first.averageRating);
+  }, [reviews]);
+
+  const highestRatedMenu = menuSummaries[0] ?? null;
+  const lowestRatedMenu = menuSummaries[menuSummaries.length - 1] ?? null;
 
   const filteredReviews = reviews.filter((review) => filter === "Semua" || getSentiment(review) === filter);
 
@@ -122,6 +166,52 @@ export default function ReviewAnalysis() {
           </div>
         ))}
       </div>
+
+      <section>
+        <div>
+          <h2 className="text-xl font-bold text-[#2C2520]">Performa Menu</h2>
+          <p className="mt-1 text-sm text-[#2C2520]/60">Perbandingan menu berdasarkan rating dari ulasan pelanggan.</p>
+        </div>
+
+        {highestRatedMenu && lowestRatedMenu ? (
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            {[
+              { label: "Rating tertinggi", menu: highestRatedMenu, accent: "border-[#8fc9aa]" },
+              { label: "Rating terendah", menu: lowestRatedMenu, accent: "border-[#e8a398]" },
+            ].map(({ label, menu, accent }) => (
+              <article key={label} className={`rounded-2xl border-2 ${accent} bg-[#F4EAE1] p-5 shadow-sm`}>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-[#2C2520]/60">{label}</p>
+                    <h3 className="mt-1 text-xl font-bold text-[#2C2520]">{menu.name}</h3>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-[#2C2520]">{menu.averageRating.toFixed(1)}</p>
+                    <p className="text-xs text-[#2C2520]/55">dari 5 bintang</p>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-xl bg-[#FCF9F6] p-3">
+                    <p className="text-lg font-bold text-[#2C2520]">{menu.reviewCount}</p>
+                    <p className="text-xs text-[#2C2520]/55">Ulasan</p>
+                  </div>
+                  <div className="rounded-xl bg-[#dcefe7] p-3">
+                    <p className="text-lg font-bold text-[#27664e]">{menu.positivePercentage.toFixed(0)}%</p>
+                    <p className="text-xs text-[#27664e]">Positif (≥3)</p>
+                  </div>
+                  <div className="rounded-xl bg-[#fde2dc] p-3">
+                    <p className="text-lg font-bold text-[#a5483b]">{menu.poorPercentage.toFixed(0)}%</p>
+                    <p className="text-xs text-[#a5483b]">Jelek (≤2)</p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-4 rounded-2xl border border-dashed border-[#C08A57]/50 bg-[#F4EAE1] p-6 text-sm text-[#2C2520]/60">Belum ada ulasan menu untuk dianalisis.</div>
+        )}
+      </section>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-5 shadow-sm">
