@@ -195,11 +195,8 @@ export default function MenuManagement() {
           <p className="mt-2 text-[#2C2520]/65">Kelola semua produk yang tampil di area pelanggan dan kasir.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => openCreateForm("menu")} className="rounded-xl bg-[#174a43] px-4 py-3 text-sm font-bold text-white hover:bg-[#123c36]">
-            + Tambah Menu
-          </button>
-          <button type="button" onClick={() => openCreateForm("catering")} className="rounded-xl bg-[#E9785F] px-4 py-3 text-sm font-bold text-white hover:bg-[#d85f49]">
-            + Tambah Catering
+          <button type="button" onClick={() => openCreateForm()} className="rounded-xl bg-[#174a43] px-4 py-3 text-sm font-bold text-white hover:bg-[#123c36]">
+            + Tambah Produk
           </button>
         </div>
       </header>
