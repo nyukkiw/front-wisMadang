@@ -17,8 +17,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
-    if (!loading && !session) {
-      router.replace("/login"); // Redirect ke halaman login jika tidak ada session 
+    if (!loading && (!session || session.peran !== "penjual")) {
+      router.replace("/login"); // Redirect ke halaman login jika tidak ada session
     }
   }, [loading, router, session]);
 

@@ -7,7 +7,7 @@ export const dummyUsers = [
     name: "Budi",
     email: "budi@wismadang.com",
     password: "budi123",
-    role: "kasir",
+    role: "penjual",
   },
   {
     id: 2,
@@ -18,10 +18,10 @@ export const dummyUsers = [
   },
   {
     id: 3,
-    name: "Admin Wis Madang",
+    name: "Penjual Wis Madang",
     email: "admin@wismadang.com",
     password: "admin123",
-    role: "admin",
+    role: "penjual",
   },
 ];
 

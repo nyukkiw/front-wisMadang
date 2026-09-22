@@ -21,9 +21,9 @@ export default function LoginPage() {
           <div className="mt-6 rounded-xl bg-[#EAF2ED] p-4 text-sm text-gray-600">
             <p className="font-semibold">Akun Demo</p>
 
-            <p className="mt-2">Admin: admin@wismadang.com / admin123</p>
+            <p className="mt-2">Penjual: admin@wismadang.com / admin123</p>
 
-            <p>Kasir: budi@wismadang.com / budi123</p>
+            <p>Penjual: budi@wismadang.com / budi123</p>
 
             <p>Pelanggan: nyuk@gmail.com/ Nyuk123</p>
           </div>

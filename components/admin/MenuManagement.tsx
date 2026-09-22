@@ -192,7 +192,7 @@ export default function MenuManagement() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-[#E9785F]">Katalog produk</p>
           <h1 className="mt-1 text-3xl font-bold text-[#2C2520]">Menu & Catering</h1>
-          <p className="mt-2 text-[#2C2520]/65">Kelola semua produk yang tampil di area pelanggan dan kasir.</p>
+          <p className="mt-2 text-[#2C2520]/65">Kelola semua produk yang tampil di area pelanggan dan transaksi penjual.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => openCreateForm()} className="rounded-xl bg-[#174a43] px-4 py-3 text-sm font-bold text-white hover:bg-[#123c36]">

@@ -34,8 +34,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (savedSession) {
         const parsed: Session = JSON.parse(savedSession);
+        const migratedRole = parsed.peran === "admin" || parsed.peran === "kasir" ? "penjual" : parsed.peran;
 
-        setSession(parsed);
+        setSession({ ...parsed, peran: migratedRole });
+        localStorage.setItem(SESSION_KEY, JSON.stringify({ ...parsed, peran: migratedRole }));
       }
     } catch (error) {
       console.error("Gagal membaca session:", error);

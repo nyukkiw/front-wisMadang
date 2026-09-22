@@ -235,7 +235,7 @@ export default function KasirPage() {
       <div className="mx-auto max-w-[1600px]">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#2C2520]">Kasir</h1>
+          <h1 className="text-2xl font-bold text-[#2C2520]">Transaksi Penjual</h1>
 
           <p className="mt-1 text-sm text-[#2C2520]/65">Kelola pesanan pelanggan dengan cepat</p>
         </div>

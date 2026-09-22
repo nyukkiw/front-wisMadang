@@ -52,7 +52,7 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
     const session = {
       token: `dummy-token-${user.id}-${Date.now()}`,
       nama: user.name,
-      peran: user.role as "admin" | "kasir" | "pelanggan",
+      peran: user.role as "penjual" | "pelanggan",
       email: user.email,
     };
 
@@ -65,11 +65,8 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
       return;
     }
 
-    // Redirect halaman dashboard berdasarkan role
-    if (user.role === "admin") {
+    if (user.role === "penjual") {
       router.push("/admin");
-    } else if (user.role === "kasir") {
-      router.push("/admin/kasir");
     } else {
       router.push("/pelanggan");
     }
@@ -78,7 +75,7 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5">
       <div>
-          <label htmlFor="identifier" className="mb-2 block text-sm font-semibold text-gray-800">
+        <label htmlFor="identifier" className="mb-2 block text-sm font-semibold text-gray-800">
           Email atau nama pengguna
         </label>
 
@@ -108,7 +105,12 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
             required
             className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 text-gray-900 placeholder:text-gray-600 outline-none focus:ring-2 focus:ring-teal-700"
           />
-          <button type="button" onClick={() => setShowPassword((visible) => !visible)} className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-gray-800" aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}>
+          <button
+            type="button"
+            onClick={() => setShowPassword((visible) => !visible)}
+            className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-gray-800"
+            aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+          >
             {showPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
           </button>
         </div>

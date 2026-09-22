@@ -79,8 +79,8 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
           </div>
         )}
 
-        {/* KASIR & ADMIN */}
-        {(role === "kasir" || role === "admin") && (
+        {/* PENJUAL */}
+        {role === "penjual" && (
           <div className="relative">
             <button onClick={() => setShowProfile(!showProfile)} className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-[#C08A57]">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4EAE1] text-[#2C2520]">
@@ -90,7 +90,7 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
               <div className="hidden text-left sm:block">
                 <p className="text-sm font-semibold">{nama}</p>
 
-                <p className="text-xs text-white/60 capitalize">{role}</p>
+                <p className="text-xs text-white/60 capitalize">Penjual</p>
               </div>
 
               <ChevronDown className="h-4 w-4" aria-hidden="true" />

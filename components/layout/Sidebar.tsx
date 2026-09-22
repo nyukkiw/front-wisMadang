@@ -23,29 +23,25 @@ export default function Sidebar({ role, isOpen, onToggle }: SidebarProps) {
   const linkClass = "mb-1 flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-[#2C2520] hover:bg-[#C08A57]/20";
 
   const navigation =
-    role === "kasir"
+    role === "pelanggan"
       ? {
-          title: "Kasir",
-          links: [{ href: "/admin/kasir", icon: ClipboardList, text: "Transaksi" }],
+          title: "Pelanggan",
+          links: [
+            { href: "/pelanggan", icon: House, text: "Dashboard" },
+            { href: "/pelanggan/menu", icon: Utensils, text: "Menu" },
+            { href: "/pelanggan/catering", icon: ChefHat, text: "Paket Catering" },
+            { href: "/pelanggan/ulasan", icon: MessageCircle, text: "Ulasan" },
+          ],
         }
-      : role === "pelanggan"
-        ? {
-            title: "Pelanggan",
-            links: [
-              { href: "/pelanggan", icon: House, text: "Dashboard" },
-              { href: "/pelanggan/menu", icon: Utensils, text: "Menu" },
-              { href: "/pelanggan/catering", icon: ChefHat, text: "Paket Catering" },
-              { href: "/pelanggan/ulasan", icon: MessageCircle, text: "Ulasan" },
-            ],
-          }
-        : {
-            title: "Admin",
-            links: [
-              { href: "/admin", icon: BarChart3, text: "Dashboard" },
-              { href: "/admin/menu", icon: Utensils, text: "Menu" },
-              { href: "/admin/ai-insight", icon: Sparkles, text: "AI Ulasan" },
-            ],
-          };
+      : {
+          title: "Penjual",
+          links: [
+            { href: "/admin", icon: BarChart3, text: "Dashboard" },
+            { href: "/admin/kasir", icon: ClipboardList, text: "Transaksi" },
+            { href: "/admin/menu", icon: Utensils, text: "Menu" },
+            { href: "/admin/ai-insight", icon: Sparkles, text: "AI Ulasan" },
+          ],
+        };
 
   // =========================
   // SIDEBAR PELANGGAN
