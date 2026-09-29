@@ -6,16 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { dummyUsers } from "@/data/dummyData";
+import { ApiError, registerRequest } from "@/lib/api";
 import { useAuth } from "@/components/auth/AuthProvider";
-
-interface RegisteredUser {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-  role: "pelanggan";
-}
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -55,34 +47,30 @@ export default function RegisterForm() {
       return;
     }
 
-    const savedUsers: RegisteredUser[] = JSON.parse(localStorage.getItem("wis-madang-registered-users") ?? "[]");
-    const emailExists = [...dummyUsers, ...savedUsers].some((user) => user.email.toLowerCase() === normalizedEmail);
-
-    if (emailExists) {
-      setError("Email sudah terdaftar. Silakan gunakan email lain atau masuk.");
-      return;
-    }
-
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 700));
 
-    const newUser: RegisteredUser = {
-      id: Date.now(),
-      name: name.trim(),
-      email: normalizedEmail,
-      password,
-      role: "pelanggan",
-    };
+    try {
+      const result = await registerRequest({
+        nama: name.trim(),
+        email: normalizedEmail,
+        kata_sandi: password,
+        peran: "pelanggan",
+      });
 
-    localStorage.setItem("wis-madang-registered-users", JSON.stringify([...savedUsers, newUser]));
-    login({
-      token: `dummy-token-${newUser.id}`,
-      nama: newUser.name,
-      peran: newUser.role,
-      email: newUser.email,
-    });
-    setLoading(false);
-    router.push("/pelanggan");
+      login({
+        token: result.token,
+        nama: result.pengguna.nama,
+        peran: result.pengguna.peran,
+        email: result.pengguna.email,
+      });
+
+      setLoading(false);
+      router.push("/pelanggan");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Tidak dapat terhubung ke server. Coba lagi.");
+
+      setLoading(false);
+    }
   };
 
   return (

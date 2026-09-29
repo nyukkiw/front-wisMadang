@@ -7,7 +7,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { dummyUsers } from "@/data/dummyData";
+import { ApiError, loginRequest } from "@/lib/api";
 import { useAuth } from "./AuthProvider";
 
 interface LoginFormProps {
@@ -35,40 +35,34 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
     setError("");
     setLoading(true);
 
-    // Simulasi proses login
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      const result = await loginRequest(identifier, password);
 
-    const registeredUsers = JSON.parse(localStorage.getItem("wis-madang-registered-users") ?? "[]");
-    const users = [...dummyUsers, ...registeredUsers];
-    const user = users.find((item) => (item.email === identifier.trim() || item.name.toLowerCase() === identifier.trim().toLowerCase()) && item.password === password);
+      const session = {
+        token: result.token,
+        nama: result.pengguna.nama,
+        peran: result.pengguna.peran,
+        email: result.pengguna.email,
+      };
 
-    if (!user) {
-      setError("Username/email atau password yang Anda masukkan salah.");
+      login(session);
 
       setLoading(false);
-      return;
-    }
 
-    const session = {
-      token: `dummy-token-${user.id}-${Date.now()}`,
-      nama: user.name,
-      peran: user.role as "penjual" | "pelanggan",
-      email: user.email,
-    };
+      if (onSuccess) {
+        onSuccess();
+        return;
+      }
 
-    login(session);
+      if (session.peran === "penjual") {
+        router.push("/admin");
+      } else {
+        router.push("/pelanggan");
+      }
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Tidak dapat terhubung ke server. Coba lagi.");
 
-    setLoading(false);
-
-    if (onSuccess) {
-      onSuccess();
-      return;
-    }
-
-    if (user.role === "penjual") {
-      router.push("/admin");
-    } else {
-      router.push("/pelanggan");
+      setLoading(false);
     }
   };
 

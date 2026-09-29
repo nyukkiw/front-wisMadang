@@ -34,10 +34,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (savedSession) {
         const parsed: Session = JSON.parse(savedSession);
+        // start: pre-existing TS error (TS2367), tidak diubah atas permintaan user - lihat catatan chat
         const migratedRole = parsed.peran === "admin" || parsed.peran === "kasir" ? "penjual" : parsed.peran;
 
         setSession({ ...parsed, peran: migratedRole });
         localStorage.setItem(SESSION_KEY, JSON.stringify({ ...parsed, peran: migratedRole }));
+        // end
       }
     } catch (error) {
       console.error("Gagal membaca session:", error);
