@@ -1,24 +1,85 @@
-// File untuk halaman kasir, menampilkan daftar menu dan keranjang belanja
+// File untuk halaman kasir - transaksi langsung, keranjang & pembayaran tersambung ke backend + Midtrans (sama kayak alur pelanggan)
 
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Script from "next/script";
 import { Search } from "lucide-react";
 
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ApiError, ApiIsiKeranjang, ambilKeranjang, checkoutRequest, konfirmasiPembayaranRequest, ubahKeranjang } from "@/lib/api";
 import { dummyCategories } from "@/data/dummyData";
+import { FALLBACK_IMAGE } from "@/lib/menuCatalog";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
 
 import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
-
 import MenuFilter from "@/components/kasir/MenuFilter";
-
 import SearchMenu from "@/components/kasir/SearchMenu";
-
 import CartPanel, { CartItem } from "@/components/kasir/CartPanel";
-
 import ReceiptModal from "@/components/kasir/ReceiptModal";
 
+const MIDTRANS_CLIENT_KEY = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY ?? "";
+const MIDTRANS_SNAP_URL = "https://app.sandbox.midtrans.com/snap/snap.js";
+
+interface HasilPembayaranMidtrans {
+  payment_type: string;
+}
+
+declare global {
+  interface Window {
+    snap?: {
+      pay: (
+        snapToken: string,
+        options?: {
+          onSuccess?: (hasil: HasilPembayaranMidtrans) => void;
+          onPending?: (hasil: HasilPembayaranMidtrans) => void;
+          onError?: () => void;
+          onClose?: () => void;
+        },
+      ) => void;
+    };
+  }
+}
+
+function ubahIsiKeranjangJadiCartItem(item: ApiIsiKeranjang): CartItem | null {
+  if (item.menu) {
+    return {
+      id: item.menu.id,
+      name: item.menu.nama_menu,
+      category: item.menu.kategori.nama_kategori.toLowerCase(),
+      price: Number(item.menu.harga),
+      rating: item.menu.ulasan_avg_rating ? Number(item.menu.ulasan_avg_rating) : 0,
+      review_count: item.menu.ulasan_count ?? 0,
+      available: item.menu.status_stok === "tersedia",
+      apakah_laris: item.menu.apakah_laris,
+      image: item.menu.gambar_url ?? FALLBACK_IMAGE,
+      description: item.menu.deskripsi ?? "",
+      qty: item.jumlah,
+    };
+  }
+
+  if (item.paket_catering) {
+    return {
+      id: item.paket_catering.id + 1000, // dijauhkan dari rentang id menu, konsisten sama pola di useMenuCatalog.ts
+      name: item.paket_catering.nama_paket,
+      category: "catering",
+      price: Number(item.paket_catering.harga_paket),
+      rating: item.paket_catering.ulasan_avg_rating ? Number(item.paket_catering.ulasan_avg_rating) : 0,
+      review_count: item.paket_catering.ulasan_count ?? 0,
+      available: true,
+      apakah_laris: false,
+      image: item.paket_catering.gambar_url ?? FALLBACK_IMAGE,
+      description: item.paket_catering.deskripsi ?? "",
+      qty: item.jumlah,
+    };
+  }
+
+  return null;
+}
+
 export default function KasirPage() {
+  const { session } = useAuth();
+
   // =========================
   // STATE
   // =========================
@@ -26,42 +87,52 @@ export default function KasirPage() {
   const [search, setSearch] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState("semua");
-  const catalog = useMenuCatalog();
-  const availableMenus = catalog
-    .filter((item) => item.type === "menu")
-    .map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }));
+  const { catalog, pesanError } = useMenuCatalog();
+  const [pesanErrorTampil, setPesanErrorTampil] = useState("");
+  const availableMenus = catalog.map((item) => ({
+    ...item,
+    category: item.type === "catering" ? "catering" : (item.category ?? "lainnya"),
+    rating: item.rating ?? 0,
+    review_count: item.review_count ?? 0,
+    apakah_laris: item.apakah_laris ?? false,
+  }));
+  const kategoriFilter = [...dummyCategories, { id: "catering", name: "Catering" }];
 
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [cartLoaded, setCartLoaded] = useState(false); // Menandai apakah keranjang sudah dimuat dari localStorage
-  useEffect(() => {
-    const savedCart = localStorage.getItem("wis-madang-cart");
 
-    if (savedCart) {
-      // Jika ada data keranjang yang tersimpan, muat ke state
-      setCart(JSON.parse(savedCart));
-    }
-    // Menandakan bahwa proses mengambil cart sudah selesai
-    setCartLoaded(true);
-  }, []);
-
-  // Menyimpan keranjang ke localStorage setiap kali cart berubah
-  useEffect(() => {
-    // Jangan simpan sebelum data awal selesai dimuat
-    if (!cartLoaded) {
+  const muatUlangKeranjang = () => {
+    if (!session) {
+      setCart([]);
       return;
     }
 
-    localStorage.setItem("wis-madang-cart", JSON.stringify(cart));
-  }, [cart, cartLoaded]);
+    ambilKeranjang(session.token)
+      .then((isiKeranjang) => setCart(isiKeranjang.map(ubahIsiKeranjangJadiCartItem).filter((item): item is CartItem => item !== null)))
+      .catch((error) => setPesanErrorTampil(error instanceof ApiError ? error.message : "Gagal memuat keranjang."));
+  };
 
-  // Metode pembayaran
-  const [paymentMethod, setPaymentMethod] = useState("QRIS");
+  useEffect(muatUlangKeranjang, [session]);
+
+  useEffect(() => {
+    setPesanErrorTampil(pesanError);
+  }, [pesanError]);
+
+  useEffect(() => {
+    if (!pesanErrorTampil) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setPesanErrorTampil(""), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [pesanErrorTampil]);
 
   // Menampilkan struk
   const [showReceipt, setShowReceipt] = useState(false);
 
-  // Nomor pesanan
+  // Nomor pesanan & metode pembayaran, diisi dari hasil Midtrans setelah bayar sukses
   const [orderNumber, setOrderNumber] = useState("");
+  const [metodeStruk, setMetodeStruk] = useState("Tunai");
+  const [itemStruk, setItemStruk] = useState<CartItem[]>([]);
 
   // =========================
   // FILTER MENU
@@ -78,152 +149,115 @@ export default function KasirPage() {
   }, [availableMenus, search, selectedCategory]);
 
   // =========================
-  // TAMBAH MENU
+  // UBAH ISI KERANJANG (tambah/kurangi/hapus, semuanya lewat backend)
   // =========================
 
-  const handleAddMenu = (menu: MenuItem) => {
-    setCart((currentCart) => {
-      const existingItem = currentCart.find((item) => item.id === menu.id);
-
-      if (existingItem) {
-        return currentCart.map((item) =>
-          item.id === menu.id
-            ? {
-                ...item,
-                qty: item.qty + 1,
-              }
-            : item,
-        );
-      }
-
-      return [
-        ...currentCart,
-        {
-          ...menu,
-          qty: 1,
-        },
-      ];
-    });
-  };
-
-  // =========================
-  // TAMBAH QUANTITY
-  // =========================
-
-  const handleIncrease = (id: number) => {
-    setCart((currentCart) =>
-      currentCart.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              qty: item.qty + 1,
-            }
-          : item,
-      ),
-    );
-  };
-
-  // =========================
-  // KURANGI QUANTITY
-  // =========================
-
-  const handleDecrease = (id: number) => {
-    setCart((currentCart) =>
-      currentCart
-        .map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                qty: item.qty - 1,
-              }
-            : item,
-        )
-        .filter((item) => item.qty > 0),
-    );
-  };
-
-  // =========================
-  // HAPUS ITEM
-  // =========================
-
-  const handleRemove = (id: number) => {
-    setCart((currentCart) => currentCart.filter((item) => item.id !== id));
-  };
-
-  // =========================
-  // AI SUGGESTION
-  // =========================
-
-  const suggestions = useMemo(() => {
-    // AI suggestion hanya muncul
-    // jika ada Nasi atau Lauk
-    const hasNasiOrLauk = cart.some((item) => item.category === "nasi" || item.category === "lauk");
-
-    if (!hasNasiOrLauk) {
-      return [];
-    }
-
-    // Ambil menu yang belum ada
-    // di keranjang
-    const cartIds = cart.map((item) => item.id);
-
-    return availableMenus.filter((menu) => menu.available && !cartIds.includes(menu.id) && (menu.category === "lauk" || menu.category === "minuman")).slice(0, 2);
-  }, [cart]);
-
-  // =========================
-  // TAMBAH DARI AI
-  // =========================
-
-  const handleAddSuggestion = (menu: MenuItem) => {
-    handleAddMenu(menu);
-  };
-
-  // =========================
-  // BAYAR
-  // =========================
-
-  const handlePay = () => {
-    if (cart.length === 0) {
+  const kirimAksiKeranjang = async (id: number, kategori: string, aksi: "tambah" | "kurangi" | "hapus") => {
+    if (!session) {
       return;
     }
 
-    // Buat nomor order dummy
-    // Contoh:
-    // MADANG-2026-00001
-    const number = `MADANG-${new Date().getFullYear()}-` + `${String(Math.floor(Math.random() * 10000)).padStart(4, "0")}`;
+    const payload = kategori === "catering" ? { paket_id: id - 1000, jumlah: 1, aksi } : { menu_id: id, jumlah: 1, aksi };
 
-    setOrderNumber(number);
+    try {
+      await ubahKeranjang(session.token, payload);
+      muatUlangKeranjang();
+    } catch (error) {
+      setPesanErrorTampil(error instanceof ApiError ? error.message : "Gagal mengubah keranjang.");
+    }
+  };
 
-    // Tampilkan struk
-    setShowReceipt(true);
+  const handleAddMenu = (menu: MenuItem) => {
+    kirimAksiKeranjang(menu.id, menu.category, "tambah");
+  };
+
+  const handleIncrease = (id: number) => {
+    const item = cart.find((cartItem) => cartItem.id === id);
+    if (item) {
+      kirimAksiKeranjang(id, item.category, "tambah");
+    }
+  };
+
+  const handleDecrease = (id: number) => {
+    const item = cart.find((cartItem) => cartItem.id === id);
+    if (item) {
+      kirimAksiKeranjang(id, item.category, "kurangi");
+    }
+  };
+
+  const handleRemove = (id: number) => {
+    const item = cart.find((cartItem) => cartItem.id === id);
+    if (item) {
+      kirimAksiKeranjang(id, item.category, "hapus");
+    }
   };
 
   // =========================
-  // HITUNG TOTAL
+  // BAYAR (checkout -> popup Midtrans -> konfirmasi), sama persis kayak alur pelanggan
   // =========================
 
-  const subtotal = cart.reduce((total, item) => total + item.price * item.qty, 0);
+  const handlePay = async () => {
+    if (cart.length === 0 || !session) {
+      return;
+    }
 
-  const tax = subtotal * 0.1;
+    if (!window.snap) {
+      setPesanErrorTampil("Layanan pembayaran belum siap, coba lagi sebentar.");
+      return;
+    }
 
-  const total = subtotal + tax;
+    try {
+      const hasil = await checkoutRequest(session.token);
+      const salinanItem = cart;
+
+      const konfirmasiKeServer = async (metodePembayaran: string, status: "diproses" | "menunggu_pembayaran") => {
+        try {
+          await konfirmasiPembayaranRequest(session.token, hasil.nomor_pesanan, metodePembayaran, status);
+          muatUlangKeranjang();
+        } catch (error) {
+          setPesanErrorTampil(error instanceof ApiError ? error.message : "Pembayaran diterima, tapi gagal mencatat pesanan.");
+        }
+      };
+
+      window.snap.pay(hasil.snap_token, {
+        onSuccess: (hasilPembayaran) => {
+          konfirmasiKeServer(hasilPembayaran.payment_type, "diproses");
+          setItemStruk(salinanItem);
+          setMetodeStruk(hasilPembayaran.payment_type);
+          setOrderNumber(hasil.nomor_pesanan);
+          setShowReceipt(true);
+        },
+        onPending: (hasilPembayaran) => {
+          konfirmasiKeServer(hasilPembayaran.payment_type, "menunggu_pembayaran");
+          setPesanErrorTampil(`Pembayaran pesanan ${hasil.nomor_pesanan} masih tertunda.`);
+        },
+        onError: () => {
+          setPesanErrorTampil(`Pembayaran pesanan ${hasil.nomor_pesanan} gagal.`);
+        },
+        onClose: () => {
+          setPesanErrorTampil("Jendela pembayaran ditutup. Pesanan belum dibuat, barang tetap ada di keranjang.");
+        },
+      });
+    } catch (error) {
+      setPesanErrorTampil(error instanceof ApiError ? error.message : "Checkout gagal. Coba lagi nanti.");
+    }
+  };
+
+  // =========================
+  // HITUNG TOTAL STRUK
+  // =========================
+
+  const totalStruk = itemStruk.reduce((total, item) => total + item.price * item.qty, 0);
+  const taxStruk = totalStruk * 0.1;
 
   // =========================
   // PESANAN BARU
   // =========================
 
   const handleNewOrder = () => {
-    // Kosongkan keranjang
-    setCart([]);
-
-    // Reset metode pembayaran
-    setPaymentMethod("QRIS");
-
-    // Tutup struk
     setShowReceipt(false);
-
-    // Reset nomor order
     setOrderNumber("");
+    setItemStruk([]);
   };
 
   // =========================
@@ -232,6 +266,8 @@ export default function KasirPage() {
 
   return (
     <main className="min-h-screen bg-[#FCF9F6] p-6">
+      <Script src={MIDTRANS_SNAP_URL} data-client-key={MIDTRANS_CLIENT_KEY} strategy="afterInteractive" />
+
       <div className="mx-auto max-w-[1600px]">
         {/* Header */}
         <div className="mb-6">
@@ -249,8 +285,13 @@ export default function KasirPage() {
 
             {/* Filter */}
             <div className="mt-4">
-              <MenuFilter categories={dummyCategories} selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
+              <MenuFilter categories={kategoriFilter} selectedCategory={selectedCategory} onCategoryChange={setSelectedCategory} />
             </div>
+
+            {/* Pesan error kalau ada masalah keranjang/menu/pembayaran */}
+            {pesanErrorTampil && (
+              <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{pesanErrorTampil}</div>
+            )}
 
             {/* Menu Grid */}
             <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -273,17 +314,7 @@ export default function KasirPage() {
 
           {/* PESANAN */}
           <aside>
-            <CartPanel
-              cart={cart}
-              suggestions={suggestions}
-              paymentMethod={paymentMethod}
-              onPaymentMethodChange={setPaymentMethod}
-              onAddSuggestion={handleAddSuggestion}
-              onIncrease={handleIncrease}
-              onDecrease={handleDecrease}
-              onRemove={handleRemove}
-              onPay={handlePay}
-            />
+            <CartPanel cart={cart} onIncrease={handleIncrease} onDecrease={handleDecrease} onRemove={handleRemove} onPay={handlePay} />
           </aside>
         </div>
       </div>
@@ -292,7 +323,9 @@ export default function KasirPage() {
           STRUK DIGITAL
       ========================= */}
 
-      {showReceipt && <ReceiptModal orderNumber={orderNumber} items={cart} subtotal={subtotal} tax={tax} total={total} paymentMethod={paymentMethod} onClose={handleNewOrder} />}
+      {showReceipt && (
+        <ReceiptModal orderNumber={orderNumber} items={itemStruk} subtotal={totalStruk} tax={taxStruk} total={totalStruk + taxStruk} paymentMethod={metodeStruk} onClose={handleNewOrder} />
+      )}
     </main>
   );
 }

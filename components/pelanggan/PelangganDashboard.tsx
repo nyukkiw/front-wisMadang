@@ -13,15 +13,15 @@ import { CartToast, notifyCustomerCartUpdated } from "@/components/pelanggan/Car
 import { CatalogItem, normalizeCatalogImage } from "@/lib/menuCatalog";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
 import { useAuth } from "@/components/auth/AuthProvider";
-
-const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
+import { ApiError, ubahKeranjang } from "@/lib/api";
 
 export default function CustomerDashboard() {
   const [cateringPage, setCateringPage] = useState(0);
   const [cartMessage, setCartMessage] = useState("");
   const [selectedCatering, setSelectedCatering] = useState<CatalogItem | null>(null);
   const { session, openLogin } = useAuth();
-  const catalog = useMenuCatalog();
+  const { catalog, pesanError } = useMenuCatalog();
+  const [pesanErrorTampil, setPesanErrorTampil] = useState("");
 
   const popularMenus = catalog
     .filter((item) => item.type === "menu" && item.apakah_laris)
@@ -34,22 +34,22 @@ export default function CustomerDashboard() {
   const cateringPackages = catalog.filter((item) => item.type === "catering");
   const visibleCatering = cateringPackages.slice(start, start + cateringPerPage);
 
-  const addToCart = (item: CatalogItem) => {
+  const addToCart = async (item: CatalogItem) => {
     if (!session || session.peran !== "pelanggan") {
       openLogin();
       return;
     }
 
-    const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
-    const cart = savedCart ? JSON.parse(savedCart) : [];
-    const existingItem = cart.find((cartItem: CatalogItem & { quantity: number }) => cartItem.id === item.id && cartItem.type === item.type);
-    const nextCart = existingItem
-      ? cart.map((cartItem: CatalogItem & { quantity: number }) => (cartItem.id === item.id && cartItem.type === item.type ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem))
-      : [...cart, { ...item, quantity: 1 }];
+    // Id paket catering di katalog digeser +1000 supaya gak bentrok sama id menu (lihat useMenuCatalog.ts)
+    const payload = item.type === "catering" ? { paket_id: item.id - 1000, jumlah: 1, aksi: "tambah" as const } : { menu_id: item.id, jumlah: 1, aksi: "tambah" as const };
 
-    localStorage.setItem(CUSTOMER_CART_KEY, JSON.stringify(nextCart));
-    notifyCustomerCartUpdated();
-    setCartMessage(`${item.name} ditambahkan ke keranjang.`);
+    try {
+      await ubahKeranjang(session.token, payload);
+      notifyCustomerCartUpdated();
+      setCartMessage(`${item.name} ditambahkan ke keranjang.`);
+    } catch (error) {
+      setCartMessage(error instanceof ApiError ? error.message : "Gagal menambahkan ke keranjang.");
+    }
   };
 
   useEffect(() => {
@@ -60,6 +60,19 @@ export default function CustomerDashboard() {
     const timeoutId = window.setTimeout(() => setCartMessage(""), 3200);
     return () => window.clearTimeout(timeoutId);
   }, [cartMessage]);
+
+  useEffect(() => {
+    setPesanErrorTampil(pesanError);
+  }, [pesanError]);
+
+  useEffect(() => {
+    if (!pesanErrorTampil) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setPesanErrorTampil(""), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [pesanErrorTampil]);
 
   useEffect(() => {
     if (!selectedCatering) {
@@ -90,6 +103,10 @@ export default function CustomerDashboard() {
             Lihat semua menu
           </Link>
         </div>
+
+        {pesanErrorTampil && (
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{pesanErrorTampil}</div>
+        )}
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {popularMenus.map((menu) => (

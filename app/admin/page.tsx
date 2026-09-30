@@ -5,42 +5,37 @@
 import { useEffect, useMemo, useState } from "react";
 import { Star } from "lucide-react";
 
-import { CUSTOMER_REVIEWS_KEY, CustomerReview } from "@/components/pelanggan/ReviewForm";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { ApiError, RingkasanDashboard, ambilRingkasanDashboard } from "@/lib/api";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
 
-// File untuk halaman dashboard admin, menampilkan ringkasan bisnis WIS MADANG
-
 export default function AdminDashboard() {
-  const catalog = useMenuCatalog();
-  const [reviews, setReviews] = useState<CustomerReview[]>([]);
+  const { session } = useAuth();
+  const { catalog } = useMenuCatalog();
+  const [ringkasan, setRingkasan] = useState<RingkasanDashboard | null>(null);
+  const [pesanError, setPesanError] = useState("");
 
   useEffect(() => {
-    const savedReviews = localStorage.getItem(CUSTOMER_REVIEWS_KEY);
-
-    if (!savedReviews) {
+    if (!session) {
       return;
     }
 
-    try {
-      setReviews(JSON.parse(savedReviews));
-    } catch {
-      localStorage.removeItem(CUSTOMER_REVIEWS_KEY);
+    ambilRingkasanDashboard(session.token)
+      .then(setRingkasan)
+      .catch((error) => setPesanError(error instanceof ApiError ? error.message : "Gagal memuat ringkasan dashboard."));
+  }, [session]);
+
+  useEffect(() => {
+    if (!pesanError) {
+      return;
     }
-  }, []);
 
-  const menuRatings = useMemo(
-    () =>
-      catalog.map((item) => {
-        const itemReviews = reviews.filter((review) => review.itemNames.some((itemName) => itemName.trim().toLowerCase() === item.name.trim().toLowerCase()));
-        const rating = itemReviews.length === 0 ? 0 : itemReviews.reduce((total, review) => total + review.rating, 0) / itemReviews.length;
+    const timeoutId = window.setTimeout(() => setPesanError(""), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [pesanError]);
 
-        return { ...item, rating, reviewCount: itemReviews.length };
-      }),
-    [catalog, reviews],
-  );
-
-  const ratedMenus = menuRatings.filter((item) => item.reviewCount > 0);
-  const averageMenuRating = ratedMenus.length === 0 ? 0 : ratedMenus.reduce((total, item) => total + item.rating, 0) / ratedMenus.length;
+  const ratedMenus = useMemo(() => catalog.filter((item) => (item.review_count ?? 0) > 0), [catalog]);
+  const averageMenuRating = ratedMenus.length === 0 ? 0 : ratedMenus.reduce((total, item) => total + (item.rating ?? 0), 0) / ratedMenus.length;
 
   return (
     <div>
@@ -48,17 +43,19 @@ export default function AdminDashboard() {
 
       <p className="mt-2 text-[#2C2520]/65">Ringkasan bisnis WIS MADANG hari ini.</p>
 
+      {pesanError && <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{pesanError}</p>}
+
       <div className="mt-6 grid gap-5 md:grid-cols-3">
         <div className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-6 shadow-sm">
           <p className="text-sm text-[#2C2520]/65">Omzet Hari Ini</p>
 
-          <h2 className="mt-2 text-2xl font-bold">Rp2.450.000</h2>
+          <h2 className="mt-2 text-2xl font-bold">Rp{(ringkasan?.omzet_hari_ini ?? 0).toLocaleString("id-ID")}</h2>
         </div>
 
         <div className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-6 shadow-sm">
-          <p className="text-sm text-[#2C2520]/65">Total Pesanan</p>
+          <p className="text-sm text-[#2C2520]/65">Total Pesanan Hari Ini</p>
 
-          <h2 className="mt-2 text-2xl font-bold">48</h2>
+          <h2 className="mt-2 text-2xl font-bold">{ringkasan?.total_pesanan_hari_ini ?? 0}</h2>
         </div>
 
         <div className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-6 shadow-sm">
@@ -79,7 +76,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {menuRatings.map((item) => (
+          {catalog.map((item) => (
             <article key={`${item.type}-${item.id}`} className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-5 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -88,10 +85,10 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex items-center gap-1 font-bold text-[#2C2520]">
                   <Star className="h-4 w-4 fill-[#E9785F] text-[#E9785F]" aria-hidden="true" />
-                  {item.rating.toFixed(1)}
+                  {(item.rating ?? 0).toFixed(1)}
                 </div>
               </div>
-              <p className="mt-3 text-sm text-[#2C2520]/60">{item.reviewCount} ulasan pelanggan</p>
+              <p className="mt-3 text-sm text-[#2C2520]/60">{item.review_count ?? 0} ulasan pelanggan</p>
             </article>
           ))}
         </div>

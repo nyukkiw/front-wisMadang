@@ -6,38 +6,36 @@ import { useEffect, useState } from "react";
 
 import Image from "next/image";
 
-import { CartToast, CUSTOMER_CART_KEY, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
+import { CartToast, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 import { CatalogItem } from "@/lib/menuCatalog";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ApiError, ubahKeranjang } from "@/lib/api";
 const ITEMS_PER_PAGE = 4;
 
 export default function CateringList() {
   const [page, setPage] = useState(0);
   const [cartMessage, setCartMessage] = useState("");
   const { session, openLogin } = useAuth();
-  const catalog = useMenuCatalog();
+  const { catalog } = useMenuCatalog();
   const cateringPackages = catalog.filter((item) => item.type === "catering" && typeof item.portions === "number");
   const pageCount = Math.max(1, Math.ceil(cateringPackages.length / ITEMS_PER_PAGE));
   const visiblePackages = cateringPackages.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
-  const addToCart = (packageItem: CatalogItem) => {
+  const addToCart = async (packageItem: CatalogItem) => {
     if (!session || session.peran !== "pelanggan") {
       openLogin();
       return;
     }
 
-    const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
-    const cart: Array<CatalogItem & { quantity: number }> = savedCart ? JSON.parse(savedCart) : [];
-    const existingItem = cart.find((item) => item.id === packageItem.id && item.type === "catering");
-
-    const nextCart = existingItem
-      ? cart.map((item) => (item.id === packageItem.id && item.type === "catering" ? { ...item, quantity: item.quantity + 1 } : item))
-      : [...cart, { ...packageItem, quantity: 1, type: "catering" }];
-
-    localStorage.setItem(CUSTOMER_CART_KEY, JSON.stringify(nextCart));
-		notifyCustomerCartUpdated();
-    setCartMessage(`${packageItem.name} ditambahkan ke keranjang.`);
+    try {
+      // Id paket catering di katalog digeser +1000 supaya gak bentrok sama id menu (lihat useMenuCatalog.ts)
+      await ubahKeranjang(session.token, { paket_id: packageItem.id - 1000, jumlah: 1, aksi: "tambah" });
+      notifyCustomerCartUpdated();
+      setCartMessage(`${packageItem.name} ditambahkan ke keranjang.`);
+    } catch (error) {
+      setCartMessage(error instanceof ApiError ? error.message : "Gagal menambahkan ke keranjang.");
+    }
   };
 
   useEffect(() => {

@@ -1,8 +1,6 @@
 "use client";
 import Image from "next/image";
-import AISuggestion from "@/components/kasir/AISuggestion";
 import type { MenuItem } from "@/components/kasir/MenuCard";
-import PaymentMethod from "@/components/kasir/PaymentMethod";
 
 export interface CartItem extends MenuItem {
   qty: number;
@@ -10,17 +8,13 @@ export interface CartItem extends MenuItem {
 
 interface CartPanelProps {
   cart: CartItem[];
-  suggestions: MenuItem[];
-  paymentMethod: string;
-  onPaymentMethodChange: (method: string) => void;
-  onAddSuggestion: (menu: MenuItem) => void;
   onIncrease: (id: number) => void;
   onDecrease: (id: number) => void;
   onRemove: (id: number) => void;
   onPay: () => void;
 }
 
-export default function CartPanel({ cart, suggestions, paymentMethod, onPaymentMethodChange, onAddSuggestion, onIncrease, onDecrease, onRemove, onPay }: CartPanelProps) {
+export default function CartPanel({ cart, onIncrease, onDecrease, onRemove, onPay }: CartPanelProps) {
   const subtotal = cart.reduce((total, item) => total + item.price * item.qty, 0);
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
@@ -55,8 +49,6 @@ export default function CartPanel({ cart, suggestions, paymentMethod, onPaymentM
           ))
         )}
       </div>
-      <AISuggestion suggestions={suggestions} onAdd={onAddSuggestion} />
-      <PaymentMethod selectedMethod={paymentMethod} onChange={onPaymentMethodChange} />
       <div className="mt-5 border-t border-gray-100 pt-4 text-sm">
         <div className="flex justify-between font-semibold text-gray-800">
           <span>Subtotal</span>

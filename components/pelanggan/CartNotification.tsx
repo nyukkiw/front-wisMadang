@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Check, ShoppingCart, X } from "lucide-react";
 
+import { ambilKeranjang } from "@/lib/api";
+
 export const CUSTOMER_CART_KEY = "wis-madang-customer-cart";
 export const CUSTOMER_CART_UPDATED_EVENT = "wis-madang-cart-updated";
 
@@ -10,42 +12,40 @@ export function notifyCustomerCartUpdated() {
   window.dispatchEvent(new Event(CUSTOMER_CART_UPDATED_EVENT));
 }
 
-function readCartCount() {
-  try {
-    const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
-    const cart = savedCart ? JSON.parse(savedCart) : [];
-
-    return Array.isArray(cart) ? cart.reduce((total, item) => total + (Number(item.quantity) || 0), 0) : 0;
-  } catch {
-    return 0;
-  }
-}
-
-export function useCustomerCartCount() {
+// token kosong artinya belum login, jadi keranjangnya dianggap kosong
+export function useCustomerCartCount(token?: string) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    const updateCount = () => setCount(readCartCount());
+    if (!token) {
+      setCount(0);
+      return;
+    }
+
+    const updateCount = () => {
+      ambilKeranjang(token)
+        .then((isiKeranjang) => setCount(isiKeranjang.reduce((total, item) => total + item.jumlah, 0)))
+        .catch(() => setCount(0));
+    };
 
     updateCount();
-    window.addEventListener("storage", updateCount);
     window.addEventListener(CUSTOMER_CART_UPDATED_EVENT, updateCount);
 
     return () => {
-      window.removeEventListener("storage", updateCount);
       window.removeEventListener(CUSTOMER_CART_UPDATED_EVENT, updateCount);
     };
-  }, []);
+  }, [token]);
 
   return count;
 }
 
 interface CartBadgeProps {
   showIcon?: boolean;
+  token?: string;
 }
 
-export function CartBadge({ showIcon = true }: CartBadgeProps) {
-  const count = useCustomerCartCount();
+export function CartBadge({ showIcon = true, token }: CartBadgeProps) {
+  const count = useCustomerCartCount(token);
 
   return (
     <span className="relative inline-flex items-center">

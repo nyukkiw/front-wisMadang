@@ -25,8 +25,8 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
   const { session, logout } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.replace("/login"); // Redirect ke halaman login setelah logout
   };
 
@@ -64,7 +64,7 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
             )}
 
             <Link href="/pelanggan/keranjang" className="text-xl hover:text-[#C08A57]" title="Keranjang">
-              <CartBadge />
+              <CartBadge token={session?.token} />
             </Link>
 
             <div className="hidden xl:block text-right">

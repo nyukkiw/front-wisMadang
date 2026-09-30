@@ -8,16 +8,18 @@ import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
 import MenuFilter from "@/components/kasir/MenuFilter";
 import SearchMenu from "@/components/kasir/SearchMenu";
 import { dummyCategories } from "@/data/dummyData";
-import { CartToast, CUSTOMER_CART_KEY, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
+import { CartToast, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { ApiError, ubahKeranjang } from "@/lib/api";
 
 export default function CostumerMenu() {
 	const [search, setSearch] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState("semua");
 	const [cartMessage, setCartMessage] = useState("");
 	const { session, openLogin } = useAuth();
-	const catalog = useMenuCatalog();
+	const { catalog, pesanError } = useMenuCatalog();
+	const [pesanErrorTampil, setPesanErrorTampil] = useState("");
 	const menuItems = catalog.filter((item) => item.type === "menu").map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }));
 
 	const filteredMenus = useMemo(() => {
@@ -31,23 +33,19 @@ export default function CostumerMenu() {
 		});
 	}, [menuItems, search, selectedCategory]);
 
-	const addToCart = (menu: MenuItem) => {
+	const addToCart = async (menu: MenuItem) => {
 		if (!session || session.peran !== "pelanggan") {
 			openLogin();
 			return;
 		}
 
-		const savedCart = localStorage.getItem(CUSTOMER_CART_KEY);
-		const cart = savedCart ? JSON.parse(savedCart) : [];
-		const existingItem = cart.find((item: MenuItem & { quantity: number; type: string }) => item.id === menu.id && item.type === "menu");
-
-		const nextCart = existingItem
-			? cart.map((item: MenuItem & { quantity: number; type: string }) => (item.id === menu.id && item.type === "menu" ? { ...item, quantity: item.quantity + 1 } : item))
-			: [...cart, { ...menu, quantity: 1, type: "menu" }];
-
-		localStorage.setItem(CUSTOMER_CART_KEY, JSON.stringify(nextCart));
-		notifyCustomerCartUpdated();
-		setCartMessage(`${menu.name} ditambahkan ke keranjang.`);
+		try {
+			await ubahKeranjang(session.token, { menu_id: menu.id, jumlah: 1, aksi: "tambah" });
+			notifyCustomerCartUpdated();
+			setCartMessage(`${menu.name} ditambahkan ke keranjang.`);
+		} catch (error) {
+			setCartMessage(error instanceof ApiError ? error.message : "Gagal menambahkan ke keranjang.");
+		}
 	};
 
 	useEffect(() => {
@@ -58,6 +56,19 @@ export default function CostumerMenu() {
 		const timeoutId = window.setTimeout(() => setCartMessage(""), 3200);
 		return () => window.clearTimeout(timeoutId);
 	}, [cartMessage]);
+
+	useEffect(() => {
+		setPesanErrorTampil(pesanError);
+	}, [pesanError]);
+
+	useEffect(() => {
+		if (!pesanErrorTampil) {
+			return;
+		}
+
+		const timeoutId = window.setTimeout(() => setPesanErrorTampil(""), 4000);
+		return () => window.clearTimeout(timeoutId);
+	}, [pesanErrorTampil]);
 
 	return (
 		<section className="space-y-6">
@@ -72,6 +83,10 @@ export default function CostumerMenu() {
 			</div>
 
 			<CartToast message={cartMessage} onClose={() => setCartMessage("")} />
+
+			{pesanErrorTampil && (
+				<div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{pesanErrorTampil}</div>
+			)}
 
 			{filteredMenus.length > 0 ? (
 				<div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

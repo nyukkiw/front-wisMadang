@@ -73,8 +73,8 @@ export default function Sidebar({ role, isOpen, onToggle }: SidebarProps) {
         {role === "pelanggan" && session && (
           <button
             type="button"
-            onClick={() => {
-              logout();
+            onClick={async () => {
+              await logout();
               router.replace("/login");
             }}
             className={`${linkClass} w-full text-left text-red-700`}

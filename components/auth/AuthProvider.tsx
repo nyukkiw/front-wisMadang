@@ -5,12 +5,13 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 import { Session } from "@/lib/auth";
+import { logoutKeServer } from "@/lib/api";
 import LoginModal from "@/components/auth/LoginModal";
 
 interface AuthContextType {
   session: Session | null;
   login: (session: Session) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   loginModalOpen: boolean;
   openLogin: () => void;
   closeLogin: () => void;
@@ -69,7 +70,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.setTimeout(() => setWelcomeMessage(""), 3500);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (session) {
+      try {
+        await logoutKeServer(session.token);
+      } catch (error) {
+        console.error("Gagal memberitahu server soal logout:", error);
+      }
+    }
+
     setSession(null);
 
     localStorage.removeItem(SESSION_KEY);
