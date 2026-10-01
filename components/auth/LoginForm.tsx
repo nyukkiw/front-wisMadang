@@ -45,7 +45,7 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
         email: result.pengguna.email,
       };
 
-      login(session);
+      login(session, rememberMe);
 
       setLoading(false);
 

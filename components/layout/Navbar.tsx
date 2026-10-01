@@ -99,8 +99,6 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
             {/* DROPDOWN */}
             {showProfile && (
               <div className="absolute right-0 mt-2 w-48 rounded-xl bg-[#F4EAE1] p-2 text-[#2C2520] shadow-xl">
-                <button className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-[#C08A57]/20">Edit Profil</button>
-
                 <button onClick={handleLogout} className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">
                   Logout
                 </button>

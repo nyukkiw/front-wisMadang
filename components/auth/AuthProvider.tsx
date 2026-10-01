@@ -1,16 +1,16 @@
-// File untuk menyimpan data dummy sebelum ada data aseli
+// File untuk mengelola sesi login pengguna (token, nama, peran) di seluruh aplikasi
 
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-import { Session } from "@/lib/auth";
+import { Session, UserRole } from "@/lib/auth";
 import { logoutKeServer } from "@/lib/api";
 import LoginModal from "@/components/auth/LoginModal";
 
 interface AuthContextType {
   session: Session | null;
-  login: (session: Session) => void;
+  login: (session: Session, ingatSaya?: boolean) => void;
   logout: () => Promise<void>;
   loginModalOpen: boolean;
   openLogin: () => void;
@@ -31,16 +31,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const savedSession = localStorage.getItem(SESSION_KEY);
+      const savedSession = localStorage.getItem(SESSION_KEY) ?? sessionStorage.getItem(SESSION_KEY);
 
       if (savedSession) {
-        const parsed: Session = JSON.parse(savedSession);
-        // start: pre-existing TS error (TS2367), tidak diubah atas permintaan user - lihat catatan chat
-        const migratedRole = parsed.peran === "admin" || parsed.peran === "kasir" ? "penjual" : parsed.peran;
+        // peran disimpan sebagai string bebas karena sesi lama bisa saja masih berisi role lama ("admin"/"kasir")
+        const parsed = JSON.parse(savedSession) as Omit<Session, "peran"> & { peran: string };
+        const migratedRole: UserRole = parsed.peran === "admin" || parsed.peran === "kasir" ? "penjual" : (parsed.peran as UserRole);
 
         setSession({ ...parsed, peran: migratedRole });
-        localStorage.setItem(SESSION_KEY, JSON.stringify({ ...parsed, peran: migratedRole }));
-        // end
+
+        const penyimpanan = localStorage.getItem(SESSION_KEY) ? localStorage : sessionStorage;
+        penyimpanan.setItem(SESSION_KEY, JSON.stringify({ ...parsed, peran: migratedRole }));
       }
     } catch (error) {
       console.error("Gagal membaca session:", error);
@@ -51,20 +52,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = (newSession: Session) => {
+  const login = (newSession: Session, ingatSaya: boolean = true) => {
     setSession(newSession);
 
-    localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
+    // "Ingat saya" dicentang -> localStorage (tetap tersimpan walau browser ditutup).
+    // Tidak dicentang -> sessionStorage (hilang begitu tab/browser ditutup).
+    const penyimpanan = ingatSaya ? localStorage : sessionStorage;
+    const penyimpananLain = ingatSaya ? sessionStorage : localStorage;
+
+    penyimpananLain.removeItem(SESSION_KEY);
+    penyimpanan.setItem(SESSION_KEY, JSON.stringify(newSession));
 
     /*
      * Cookie ini digunakan oleh Middleware.
      * Middleware tidak dapat membaca React Context
-     * atau localStorage.
+     * atau localStorage/sessionStorage.
+     * Tanpa "ingat saya", cookie dibuat jadi session cookie (ikut hilang saat browser ditutup).
      */
 
-    document.cookie = `wis_madang_token=${newSession.token}; ` + `path=/; max-age=86400; SameSite=Lax`;
+    const umurCookie = ingatSaya ? "max-age=86400; " : "";
 
-    document.cookie = `wis_madang_role=${newSession.peran}; ` + `path=/; max-age=86400; SameSite=Lax`;
+    document.cookie = `wis_madang_token=${newSession.token}; path=/; ${umurCookie}SameSite=Lax`;
+
+    document.cookie = `wis_madang_role=${newSession.peran}; path=/; ${umurCookie}SameSite=Lax`;
 
     setWelcomeMessage(`Selamat datang di Wis Madang, ${newSession.nama}!`);
     window.setTimeout(() => setWelcomeMessage(""), 3500);
@@ -82,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
 
     localStorage.removeItem(SESSION_KEY);
+    sessionStorage.removeItem(SESSION_KEY);
 
     document.cookie = "wis_madang_token=; path=/; max-age=0";
 
