@@ -41,7 +41,6 @@ interface ItemTampilan {
   kategoriId?: number;
   namaKategori?: string;
   porsi?: number;
-  apakahLaris?: boolean;
   gambarUrl?: string | null;
 }
 
@@ -52,7 +51,6 @@ interface FormState {
   harga: string;
   kategoriId: string;
   porsi: string;
-  apakahLaris: boolean;
 }
 
 const formKosong: FormState = {
@@ -62,7 +60,6 @@ const formKosong: FormState = {
   harga: "",
   kategoriId: "",
   porsi: "",
-  apakahLaris: false,
 };
 
 function ubahMenuJadiItemTampilan(menu: ApiMenu): ItemTampilan {
@@ -75,7 +72,6 @@ function ubahMenuJadiItemTampilan(menu: ApiMenu): ItemTampilan {
     tersedia: menu.status_stok === "tersedia",
     kategoriId: menu.kategori_id,
     namaKategori: menu.kategori.nama_kategori,
-    apakahLaris: menu.apakah_laris,
     gambarUrl: menu.gambar_url,
   };
 }
@@ -87,7 +83,7 @@ function ubahPaketJadiItemTampilan(paket: ApiPaketCatering): ItemTampilan {
     nama: paket.nama_paket,
     deskripsi: paket.deskripsi ?? "",
     harga: Number(paket.harga_paket),
-    tersedia: true, // paket catering belum punya status tersedia/habis di backend
+    tersedia: paket.status_stok === "tersedia",
     porsi: paket.porsi,
     gambarUrl: paket.gambar_url,
   };
@@ -169,7 +165,6 @@ export default function MenuManagement() {
       harga: String(item.harga),
       kategoriId: item.kategoriId ? String(item.kategoriId) : "",
       porsi: item.porsi ? String(item.porsi) : "",
-      apakahLaris: item.apakahLaris ?? false,
     });
     setFileGambar(null);
     setPreviewGambar(item.gambarUrl ?? null);
@@ -231,7 +226,6 @@ export default function MenuManagement() {
           nama_menu: nama,
           harga,
           deskripsi,
-          apakah_laris: form.apakahLaris,
         };
 
         const menuTersimpan = sedangEdit && sedangEdit.jenis === "menu" ? await ubahMenu(session.token, sedangEdit.id, payload) : await buatMenu(session.token, payload);
@@ -290,12 +284,19 @@ export default function MenuManagement() {
   };
 
   const ubahStatusTersedia = async (item: ItemTampilan) => {
-    if (!session || item.jenis !== "menu") {
+    if (!session) {
       return;
     }
 
+    const statusBaru = item.tersedia ? "habis" : "tersedia";
+
     try {
-      await ubahMenu(session.token, item.id, { status_stok: item.tersedia ? "habis" : "tersedia" });
+      if (item.jenis === "menu") {
+        await ubahMenu(session.token, item.id, { status_stok: statusBaru });
+      } else {
+        await ubahPaketCatering(session.token, item.id, { status_stok: statusBaru });
+      }
+
       muatUlangData();
     } catch (error) {
       setPesanError(error instanceof ApiError ? error.message : "Gagal mengubah status. Coba lagi nanti.");
@@ -360,15 +361,13 @@ export default function MenuManagement() {
                 >
                   Edit
                 </button>
-                {item.jenis === "menu" && (
-                  <button
-                    type="button"
-                    onClick={() => ubahStatusTersedia(item)}
-                    className="flex-1 rounded-lg bg-[#174a43] px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-[#123c36] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#174a43]/50"
-                  >
-                    {item.tersedia ? "Nonaktifkan" : "Aktifkan"}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => ubahStatusTersedia(item)}
+                  className="flex-1 rounded-lg bg-[#174a43] px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-[#123c36] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#174a43]/50"
+                >
+                  {item.tersedia ? "Nonaktifkan" : "Aktifkan"}
+                </button>
                 <button
                   type="button"
                   onClick={() => hapusItem(item)}
@@ -462,12 +461,6 @@ export default function MenuManagement() {
                   </div>
                 )}
               </div>
-              {form.jenis === "menu" && (
-                <label className="flex items-center gap-3 text-sm font-semibold">
-                  <input type="checkbox" checked={form.apakahLaris} onChange={(event) => setForm({ ...form, apakahLaris: event.target.checked })} className="h-4 w-4 accent-[#E9785F]" />
-                  Tandai sebagai menu populer
-                </label>
-              )}
             </div>
             {pesanFormError && <p className="mt-5 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{pesanFormError}</p>}
             <div className="mt-6 flex justify-end gap-3 border-t border-[#e2d3c5] pt-5">

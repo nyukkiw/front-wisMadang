@@ -19,7 +19,6 @@ function ubahMenuBackendJadiCatalogItem(menu: ApiMenu): CatalogItem {
     category: menu.kategori.nama_kategori.toLowerCase(),
     rating: menu.ulasan_avg_rating ? Number(menu.ulasan_avg_rating) : 0,
     review_count: menu.ulasan_count ?? 0,
-    apakah_laris: menu.apakah_laris,
   };
 }
 
@@ -31,7 +30,7 @@ function ubahPaketCateringBackendJadiCatalogItem(paket: ApiPaketCatering): Catal
     description: paket.deskripsi ?? "",
     price: Number(paket.harga_paket),
     image: paket.gambar_url ?? FALLBACK_IMAGE,
-    available: true,
+    available: paket.status_stok === "tersedia",
     portions: paket.porsi,
     rating: paket.ulasan_avg_rating ? Number(paket.ulasan_avg_rating) : 0,
     review_count: paket.ulasan_count ?? 0,

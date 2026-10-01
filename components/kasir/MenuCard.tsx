@@ -16,7 +16,6 @@ export interface MenuItem {
   rating: number;
   review_count: number;
   available: boolean;
-  apakah_laris: boolean;
   image: string;
   description: string;
 }
@@ -40,9 +39,6 @@ export default function MenuCard({ menu, onAdd }: MenuCardProps) {
         ${!menu.available ? "cursor-not-allowed opacity-50 grayscale" : "hover:-translate-y-0.5 hover:shadow-md"} 
       `} // Jika menu habis kartu buram dan button tidak bisa diklik, jika tersedia kartu bisa di hover
     >
-      {/* Badge Laris */}
-      {menu.apakah_laris && menu.available && <span className="absolute right-3 top-3 rounded-full bg-[#E9785F] px-2.5 py-1 text-xs font-semibold text-white">Laris</span>}
-
       {/* Visual */}
       <div className="relative mb-4 h-32 overflow-hidden rounded-xl bg-[#EAF2ED]">
         {isDirectImage ? (

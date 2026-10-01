@@ -1,4 +1,4 @@
-// File untuk halaman login, menampilkan form login dan informasi akun demo
+// File untuk halaman login, menampilkan form login
 
 import LoginForm from "@/components/auth/LoginForm";
 import Image from "next/image";
@@ -17,16 +17,6 @@ export default function LoginPage() {
           </div>
 
           <LoginForm />
-
-          <div className="mt-6 rounded-xl bg-[#EAF2ED] p-4 text-sm text-gray-600">
-            <p className="font-semibold">Akun Demo</p>
-
-            <p className="mt-2">Penjual: admin@wismadang.com / admin123</p>
-
-            <p>Penjual: budi@wismadang.com / budi123</p>
-
-            <p>Pelanggan: nyuk@gmail.com/ Nyuk123</p>
-          </div>
         </div>
       </div>
     </main>

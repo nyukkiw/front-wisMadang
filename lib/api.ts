@@ -122,7 +122,6 @@ export interface ApiMenu {
   harga: string;
   deskripsi: string | null;
   status_stok: "tersedia" | "habis";
-  apakah_laris: boolean;
   kategori: {
     id: number;
     nama_kategori: string;
@@ -148,6 +147,7 @@ export interface ApiPaketCatering {
   porsi: number;
   deskripsi: string | null;
   gambar_url: string | null;
+  status_stok: "tersedia" | "habis";
   // Cuma ada kalau diambil dari GET /api/paket-catering (bukan pas nempel di detail pesanan)
   ulasan_avg_rating?: string | null;
   ulasan_count?: number;
@@ -167,7 +167,6 @@ export interface MenuPayload {
   harga?: number;
   deskripsi?: string;
   status_stok?: "tersedia" | "habis";
-  apakah_laris?: boolean;
 }
 
 export async function buatMenu(token: string, payload: MenuPayload) {
@@ -204,6 +203,7 @@ export interface PaketCateringPayload {
   harga_paket?: number;
   deskripsi?: string;
   porsi?: number;
+  status_stok?: "tersedia" | "habis";
 }
 
 export async function buatPaketCatering(token: string, payload: PaketCateringPayload) {

@@ -16,7 +16,6 @@ export interface CatalogItem {
   category?: string;
   rating?: number;
   review_count?: number;
-  apakah_laris?: boolean;
   portions?: number;
 }
 

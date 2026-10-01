@@ -51,7 +51,6 @@ function ubahIsiKeranjangJadiCartItem(item: ApiIsiKeranjang): CartItem | null {
       rating: item.menu.ulasan_avg_rating ? Number(item.menu.ulasan_avg_rating) : 0,
       review_count: item.menu.ulasan_count ?? 0,
       available: item.menu.status_stok === "tersedia",
-      apakah_laris: item.menu.apakah_laris,
       image: item.menu.gambar_url ?? FALLBACK_IMAGE,
       description: item.menu.deskripsi ?? "",
       qty: item.jumlah,
@@ -67,7 +66,6 @@ function ubahIsiKeranjangJadiCartItem(item: ApiIsiKeranjang): CartItem | null {
       rating: item.paket_catering.ulasan_avg_rating ? Number(item.paket_catering.ulasan_avg_rating) : 0,
       review_count: item.paket_catering.ulasan_count ?? 0,
       available: true,
-      apakah_laris: false,
       image: item.paket_catering.gambar_url ?? FALLBACK_IMAGE,
       description: item.paket_catering.deskripsi ?? "",
       qty: item.jumlah,
@@ -94,7 +92,6 @@ export default function KasirPage() {
     category: item.type === "catering" ? "catering" : (item.category ?? "lainnya"),
     rating: item.rating ?? 0,
     review_count: item.review_count ?? 0,
-    apakah_laris: item.apakah_laris ?? false,
   }));
   const kategoriFilter = [...dummyCategories, { id: "catering", name: "Catering" }];
 

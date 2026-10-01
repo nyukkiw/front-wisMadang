@@ -23,9 +23,17 @@ export default function CustomerDashboard() {
   const { catalog, pesanError } = useMenuCatalog();
   const [pesanErrorTampil, setPesanErrorTampil] = useState("");
 
+  const semuaMenu = catalog
+    .filter((item) => item.type === "menu")
+    .map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0 }))
+    .slice(0, 4);
+
+  // Menu Populer: murni dari rating & ulasan asli pelanggan (bukan tanda manual admin).
+  // Syaratnya sudah punya minimal 1 ulasan dan rating rata-rata >= 4, diurutkan dari rating tertinggi.
   const popularMenus = catalog
-    .filter((item) => item.type === "menu" && item.apakah_laris)
-    .map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }))
+    .filter((item) => item.type === "menu" && (item.review_count ?? 0) > 0 && (item.rating ?? 0) >= 4)
+    .map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0 }))
+    .sort((a, b) => b.rating - a.rating || b.review_count - a.review_count)
     .slice(0, 4);
 
   const cateringPerPage = 4;
@@ -98,7 +106,7 @@ export default function CustomerDashboard() {
 
       <section>
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-xl font-bold">Menu Populer</h2>
+          <h2 className="text-xl font-bold">Menu</h2>
           <Link href="/pelanggan/menu" className="text-sm font-semibold text-[#C08A57] hover:underline">
             Lihat semua menu
           </Link>
@@ -109,7 +117,7 @@ export default function CustomerDashboard() {
         )}
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {popularMenus.map((menu) => (
+          {semuaMenu.map((menu) => (
             <MenuCard key={menu.id} menu={menu} onAdd={(menu) => addToCart({ ...menu, type: "menu" })} />
           ))}
         </div>
@@ -164,8 +172,28 @@ export default function CustomerDashboard() {
       </section>
 
       <section>
-        <h2 className="text-xl font-bold">Promo Hari Ini</h2>
-        {/* PromoCard */}
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-xl font-bold">Menu Populer</h2>
+          <Link href="/pelanggan/menu" className="text-sm font-semibold text-[#C08A57] hover:underline">
+            Lihat semua menu
+          </Link>
+        </div>
+
+        {pesanErrorTampil && (
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{pesanErrorTampil}</div>
+        )}
+
+        {popularMenus.length > 0 ? (
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {popularMenus.map((menu) => (
+              <MenuCard key={menu.id} menu={menu} onAdd={(menu) => addToCart({ ...menu, type: "menu" })} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-4 rounded-2xl border border-dashed border-[#C08A57]/50 bg-[#F4EAE1] p-6 text-sm text-[#2C2520]/60">Belum ada menu dengan rating tinggi dari ulasan pelanggan.</div>
+        )}
+
+        <CartToast message={cartMessage} onClose={() => setCartMessage("")} />
       </section>
 
       {selectedCatering && (

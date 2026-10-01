@@ -20,7 +20,7 @@ export default function CostumerMenu() {
 	const { session, openLogin } = useAuth();
 	const { catalog, pesanError } = useMenuCatalog();
 	const [pesanErrorTampil, setPesanErrorTampil] = useState("");
-	const menuItems = catalog.filter((item) => item.type === "menu").map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0, apakah_laris: item.apakah_laris ?? false }));
+	const menuItems = catalog.filter((item) => item.type === "menu").map((item) => ({ ...item, category: item.category ?? "lainnya", rating: item.rating ?? 0, review_count: item.review_count ?? 0 }));
 
 	const filteredMenus = useMemo(() => {
 		const normalizedSearch = search.trim().toLowerCase();
