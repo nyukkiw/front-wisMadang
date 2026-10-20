@@ -7,10 +7,10 @@ import { BarChart3, ChefHat, ClipboardList, House, LogOut, MessageCircle, Sparkl
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/auth/AuthProvider";
-import { UserRole } from "@/lib/auth";
+import { PeranPengguna } from "@/lib/auth";
 
 interface SidebarProps {
-  role: UserRole;
+  role: PeranPengguna;
   isOpen: boolean;
   onToggle: () => void;
 }

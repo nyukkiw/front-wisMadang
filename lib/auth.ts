@@ -1,10 +1,10 @@
 // File untuk mendefinisikan tipe data yang digunakan dalam autentikasi pengguna
 
-export type UserRole = "penjual" | "pelanggan";
+export type PeranPengguna = "penjual" | "pelanggan";
 
-export interface Session {
+export interface Sesi {
   token: string;
   nama: string;
-  peran: UserRole;
+  peran: PeranPengguna;
   email?: string;
 }

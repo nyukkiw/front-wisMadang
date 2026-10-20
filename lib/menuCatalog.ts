@@ -3,11 +3,11 @@
 export const MENU_CATALOG_KEY = "wis-madang-menu-catalog";
 export const FALLBACK_IMAGE = "/IMG Wis Madang/Nasi Goreng.jpg";
 
-export type CatalogItemType = "menu" | "catering";
+export type JenisItemKatalog = "menu" | "catering";
 
-export interface CatalogItem {
+export interface ItemKatalog {
   id: number;
-  type: CatalogItemType;
+  type: JenisItemKatalog;
   name: string;
   description: string;
   price: number;
@@ -19,7 +19,7 @@ export interface CatalogItem {
   portions?: number;
 }
 
-export function normalizeCatalogImage(src: unknown) {
+export function rapikanGambarKatalog(src: unknown) {
   if (typeof src !== "string") {
     return FALLBACK_IMAGE;
   }
@@ -38,6 +38,6 @@ export function normalizeCatalogImage(src: unknown) {
   }
 }
 
-export function getNextCatalogId(items: CatalogItem[]) {
+export function getNextCatalogId(items: ItemKatalog[]) {
   return Math.max(0, ...items.map((item) => item.id)) + 1;
 }

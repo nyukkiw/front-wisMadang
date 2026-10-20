@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { MessageCircle, Star } from "lucide-react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
-import { ApiDetailPesanan, ApiError, ApiPesanan, UlasanItemPayload, ambilRiwayatPesanan, kirimUlasanRequest } from "@/lib/api";
+import { ApiDetailPesanan, ApiError, ApiPesanan, DataUlasanItem, ambilRiwayatPesanan, kirimUlasanRequest } from "@/lib/api";
 
 interface FormUlasanItem {
   menuId?: number;
@@ -98,7 +98,7 @@ export default function CustomerReviewsPage() {
 
     setSedangMengirim(true);
 
-    const payload: UlasanItemPayload[] = formUlasan.map((item) => ({
+    const payload: DataUlasanItem[] = formUlasan.map((item) => ({
       menu_id: item.menuId,
       paket_id: item.paketId,
       rating: item.rating,

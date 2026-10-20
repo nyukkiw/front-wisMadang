@@ -12,7 +12,7 @@ export interface ApiPengguna {
   peran: ApiPeran;
   dibuat_pada: string;
 }
-export interface RegisterPayload {
+export interface DataPendaftaran {
   nama: string;
   email: string;
   kata_sandi: string;
@@ -20,13 +20,13 @@ export interface RegisterPayload {
   no_telepon?: string;
 }
 
-interface AuthResponse {
+interface ResponsAutentikasi {
   pesan: string;
   pengguna: ApiPengguna;
   token: string;
 }
 
-interface ApiErrorBody {
+interface DataKesalahan {
   pesan?: string;
   message?: string;
   errors?: Record<string, string[]>;
@@ -43,11 +43,11 @@ export class ApiError extends Error {
   }
 }
 
-async function handleResponse<T>(response: Response): Promise<T> {
+async function olahRespons<T>(response: Response): Promise<T> {
   const body = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    const errorBody = body as ApiErrorBody;
+    const errorBody = body as DataKesalahan;
     const message = errorBody.pesan ?? errorBody.message ?? "Terjadi kesalahan pada server.";
 
     throw new ApiError(message, response.status, errorBody.errors);
@@ -78,19 +78,19 @@ export async function loginRequest(identifier: string, kataSandi: string) {
     }),
   });
 
-  return handleResponse<AuthResponse>(response);
+  return olahRespons<ResponsAutentikasi>(response);
 }
 
 
 
-export async function registerRequest(payload: RegisterPayload) {
+export async function registerRequest(payload: DataPendaftaran) {
   const response = await fetch(`${API_BASE_URL}/api/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(payload),
   });
 
-  return handleResponse<AuthResponse>(response);
+  return olahRespons<ResponsAutentikasi>(response);
 }
 
 export async function logoutKeServer(token: string) {
@@ -99,7 +99,7 @@ export async function logoutKeServer(token: string) {
     headers: susunHeaderPakaiToken(token),
   });
 
-  return handleResponse<{ pesan: string }>(response);
+  return olahRespons<{ pesan: string }>(response);
 }
 
 export interface ApiKategori {
@@ -112,7 +112,7 @@ export async function ambilDaftarKategori() {
     headers: { Accept: "application/json" },
   });
 
-  return handleResponse<ApiKategori[]>(response);
+  return olahRespons<ApiKategori[]>(response);
 }
 
 export interface ApiMenu {
@@ -137,7 +137,7 @@ export async function ambilDaftarMenu() {
     headers: { Accept: "application/json" },
   });
 
-  return handleResponse<ApiMenu[]>(response);
+  return olahRespons<ApiMenu[]>(response);
 }
 
 export interface ApiPaketCatering {
@@ -158,10 +158,10 @@ export async function ambilDaftarPaketCatering() {
     headers: { Accept: "application/json" },
   });
 
-  return handleResponse<ApiPaketCatering[]>(response);
+  return olahRespons<ApiPaketCatering[]>(response);
 }
 
-export interface MenuPayload {
+export interface DataSimpanMenu {
   kategori_id?: number;
   nama_menu?: string;
   harga?: number;
@@ -169,24 +169,24 @@ export interface MenuPayload {
   status_stok?: "tersedia" | "habis";
 }
 
-export async function buatMenu(token: string, payload: MenuPayload) {
+export async function buatMenu(token: string, payload: DataSimpanMenu) {
   const response = await fetch(`${API_BASE_URL}/api/menu`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
   });
 
-  return handleResponse<ApiMenu>(response);
+  return olahRespons<ApiMenu>(response);
 }
 
-export async function ubahMenu(token: string, id: number, payload: MenuPayload) {
+export async function ubahMenu(token: string, id: number, payload: DataSimpanMenu) {
   const response = await fetch(`${API_BASE_URL}/api/menu/${id}`, {
     method: "PUT",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
   });
 
-  return handleResponse<ApiMenu>(response);
+  return olahRespons<ApiMenu>(response);
 }
 
 export async function hapusMenu(token: string, id: number) {
@@ -195,10 +195,10 @@ export async function hapusMenu(token: string, id: number) {
     headers: susunHeaderPakaiToken(token),
   });
 
-  return handleResponse<{ pesan: string }>(response);
+  return olahRespons<{ pesan: string }>(response);
 }
 
-export interface PaketCateringPayload {
+export interface DataSimpanPaketCatering {
   nama_paket?: string;
   harga_paket?: number;
   deskripsi?: string;
@@ -206,24 +206,24 @@ export interface PaketCateringPayload {
   status_stok?: "tersedia" | "habis";
 }
 
-export async function buatPaketCatering(token: string, payload: PaketCateringPayload) {
+export async function buatPaketCatering(token: string, payload: DataSimpanPaketCatering) {
   const response = await fetch(`${API_BASE_URL}/api/paket-catering`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
   });
 
-  return handleResponse<ApiPaketCatering>(response);
+  return olahRespons<ApiPaketCatering>(response);
 }
 
-export async function ubahPaketCatering(token: string, id: number, payload: PaketCateringPayload) {
+export async function ubahPaketCatering(token: string, id: number, payload: DataSimpanPaketCatering) {
   const response = await fetch(`${API_BASE_URL}/api/paket-catering/${id}`, {
     method: "PUT",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
   });
 
-  return handleResponse<ApiPaketCatering>(response);
+  return olahRespons<ApiPaketCatering>(response);
 }
 
 export async function hapusPaketCatering(token: string, id: number) {
@@ -232,7 +232,7 @@ export async function hapusPaketCatering(token: string, id: number) {
     headers: susunHeaderPakaiToken(token),
   });
 
-  return handleResponse<{ pesan: string }>(response);
+  return olahRespons<{ pesan: string }>(response);
 }
 
 // File gambar dikirim lewat FormData, jadi header-nya gak boleh ada Content-Type
@@ -254,7 +254,7 @@ export async function uploadGambarMenu(token: string, id: number, file: File) {
     body: formData,
   });
 
-  return handleResponse<ApiMenu>(response);
+  return olahRespons<ApiMenu>(response);
 }
 
 export async function uploadGambarPaketCatering(token: string, id: number, file: File) {
@@ -267,7 +267,7 @@ export async function uploadGambarPaketCatering(token: string, id: number, file:
     body: formData,
   });
 
-  return handleResponse<ApiPaketCatering>(response);
+  return olahRespons<ApiPaketCatering>(response);
 }
 
 export interface ApiIsiKeranjang {
@@ -280,7 +280,7 @@ export interface ApiIsiKeranjang {
   paket_catering: ApiPaketCatering | null;
 }
 
-interface ApiResponseKeranjang {
+interface ResponsKeranjang {
   success: boolean;
   message: string;
   data:
@@ -298,34 +298,34 @@ export async function ambilKeranjang(token: string) {
     headers: susunHeaderPakaiToken(token),
   });
 
-  const hasil = await handleResponse<ApiResponseKeranjang>(response);
+  const hasil = await olahRespons<ResponsKeranjang>(response);
 
   return Array.isArray(hasil.data) ? [] : hasil.data.isi_keranjang;
 }
 
 export type AksiKeranjang = "tambah" | "kurangi" | "hapus";
 
-export interface UbahKeranjangPayload {
+export interface DataUbahKeranjang {
   menu_id?: number;
   paket_id?: number;
   jumlah: number;
   aksi: AksiKeranjang;
 }
 
-interface ApiResponseUbahKeranjang {
+interface ResponsUbahKeranjang {
   success: boolean;
   message: string;
   data?: ApiIsiKeranjang;
 }
 
-export async function ubahKeranjang(token: string, payload: UbahKeranjangPayload) {
+export async function ubahKeranjang(token: string, payload: DataUbahKeranjang) {
   const response = await fetch(`${API_BASE_URL}/api/v1/keranjang/simpan`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
   });
 
-  return handleResponse<ApiResponseUbahKeranjang>(response);
+  return olahRespons<ResponsUbahKeranjang>(response);
 }
 
 export interface HasilCheckout {
@@ -336,7 +336,7 @@ export interface HasilCheckout {
   snap_token: string;
 }
 
-interface ApiResponseCheckout {
+interface ResponsCheckout {
   success: boolean;
   message: string;
   data: HasilCheckout;
@@ -350,7 +350,7 @@ export async function checkoutRequest(token: string) {
     headers: susunHeaderPakaiToken(token),
   });
 
-  const hasil = await handleResponse<ApiResponseCheckout>(response);
+  const hasil = await olahRespons<ResponsCheckout>(response);
 
   return hasil.data;
 }
@@ -365,7 +365,7 @@ export async function konfirmasiPembayaranRequest(token: string, nomorPesanan: s
     body: JSON.stringify({ nomor_pesanan: nomorPesanan, metode_pembayaran: metodePembayaran, status }),
   });
 
-  return handleResponse<{ success: boolean; message: string }>(response);
+  return olahRespons<{ success: boolean; message: string }>(response);
 }
 
 export interface ApiDetailPesanan {
@@ -407,7 +407,7 @@ export async function ambilRiwayatPesanan(token: string) {
     headers: susunHeaderPakaiToken(token),
   });
 
-  const hasil = await handleResponse<{ success: boolean; data: ApiPesanan[] }>(response);
+  const hasil = await olahRespons<{ success: boolean; data: ApiPesanan[] }>(response);
 
   return hasil.data;
 }
@@ -428,7 +428,7 @@ export async function ambilSemuaUlasan(token: string) {
     headers: susunHeaderPakaiToken(token),
   });
 
-  const hasil = await handleResponse<{ success: boolean; data: ApiUlasanLengkap[] }>(response);
+  const hasil = await olahRespons<{ success: boolean; data: ApiUlasanLengkap[] }>(response);
 
   return hasil.data;
 }
@@ -447,7 +447,7 @@ export async function ambilInsightAi(token: string) {
     headers: susunHeaderPakaiToken(token),
   });
 
-  const hasil = await handleResponse<{ success: boolean; message?: string; data?: InsightAi }>(response);
+  const hasil = await olahRespons<{ success: boolean; message?: string; data?: InsightAi }>(response);
 
   return hasil.success ? (hasil.data ?? null) : null;
 }
@@ -462,25 +462,23 @@ export async function ambilRingkasanDashboard(token: string) {
   const response = await fetch(`${API_BASE_URL}/api/v1/dashboard/ringkasan`, {
     headers: susunHeaderPakaiToken(token),
   });
-
-  const hasil = await handleResponse<{ success: boolean; data: RingkasanDashboard }>(response);
-
+  const hasil = await olahRespons<{ success: boolean; data: RingkasanDashboard }>(response);
   return hasil.data;
 }
 
-export interface UlasanItemPayload {
+export interface DataUlasanItem {
   menu_id?: number;
   paket_id?: number;
   rating: number;
   komentar?: string;
 }
 
-export async function kirimUlasanRequest(token: string, pesananId: string, ulasan: UlasanItemPayload[]) {
+export async function kirimUlasanRequest(token: string, pesananId: string, ulasan: DataUlasanItem[]) {
   const response = await fetch(`${API_BASE_URL}/api/v1/ulasan`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify({ pesanan_id: pesananId, ulasan }),
   });
 
-  return handleResponse<{ success: boolean; message: string }>(response);
+  return olahRespons<{ success: boolean; message: string }>(response);
 }

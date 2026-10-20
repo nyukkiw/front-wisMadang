@@ -5,7 +5,7 @@
 import Image from "next/image";
 import { Plus, Star } from "lucide-react";
 
-import { normalizeCatalogImage } from "@/lib/menuCatalog";
+import { rapikanGambarKatalog } from "@/lib/menuCatalog";
 
 export interface MenuItem {
   // Interface untuk menu item
@@ -27,7 +27,7 @@ interface MenuCardProps {
 }
 
 export default function MenuCard({ menu, onAdd }: MenuCardProps) {
-  const image = normalizeCatalogImage(menu.image);
+  const image = rapikanGambarKatalog(menu.image);
   const isDirectImage = image.startsWith("http://") || image.startsWith("https://") || image.startsWith("data:image/");
 
   // Component MenuCard untuk menampilkan menu item

@@ -5,9 +5,9 @@
 import { useEffect, useState } from "react";
 
 import { ApiError, ApiMenu, ApiPaketCatering, ambilDaftarMenu, ambilDaftarPaketCatering } from "@/lib/api";
-import { CatalogItem, FALLBACK_IMAGE } from "@/lib/menuCatalog";
+import { ItemKatalog, FALLBACK_IMAGE } from "@/lib/menuCatalog";
 
-function ubahMenuBackendJadiCatalogItem(menu: ApiMenu): CatalogItem {
+function ubahMenuBackendJadiItemKatalog(menu: ApiMenu): ItemKatalog {
   return {
     id: menu.id,
     type: "menu",
@@ -22,7 +22,7 @@ function ubahMenuBackendJadiCatalogItem(menu: ApiMenu): CatalogItem {
   };
 }
 
-function ubahPaketCateringBackendJadiCatalogItem(paket: ApiPaketCatering): CatalogItem {
+function ubahPaketCateringBackendJadiItemKatalog(paket: ApiPaketCatering): ItemKatalog {
   return {
     id: paket.id + 1000, // dijauhkan dari rentang id menu supaya gak bentrok pas digabung
     type: "catering",
@@ -38,13 +38,13 @@ function ubahPaketCateringBackendJadiCatalogItem(paket: ApiPaketCatering): Catal
 }
 
 export function useMenuCatalog() {
-  const [catalog, setCatalog] = useState<CatalogItem[]>([]);
+  const [catalog, setCatalog] = useState<ItemKatalog[]>([]);
   const [pesanError, setPesanError] = useState("");
 
   useEffect(() => {
     Promise.allSettled([ambilDaftarMenu(), ambilDaftarPaketCatering()]).then(([hasilMenu, hasilCatering]) => {
-      const daftarMenu = hasilMenu.status === "fulfilled" ? hasilMenu.value.map(ubahMenuBackendJadiCatalogItem) : [];
-      const daftarCatering = hasilCatering.status === "fulfilled" ? hasilCatering.value.map(ubahPaketCateringBackendJadiCatalogItem) : [];
+      const daftarMenu = hasilMenu.status === "fulfilled" ? hasilMenu.value.map(ubahMenuBackendJadiItemKatalog) : [];
+      const daftarCatering = hasilCatering.status === "fulfilled" ? hasilCatering.value.map(ubahPaketCateringBackendJadiItemKatalog) : [];
 
       setCatalog([...daftarMenu, ...daftarCatering]);
 

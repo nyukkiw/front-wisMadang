@@ -13,8 +13,8 @@ import {
   ApiKategori,
   ApiMenu,
   ApiPaketCatering,
-  MenuPayload,
-  PaketCateringPayload,
+  DataSimpanMenu,
+  DataSimpanPaketCatering,
   ambilDaftarKategori,
   ambilDaftarMenu,
   ambilDaftarPaketCatering,
@@ -221,7 +221,7 @@ export default function MenuManagement() {
           return;
         }
 
-        const payload: MenuPayload = {
+        const payload: DataSimpanMenu = {
           kategori_id: kategoriId,
           nama_menu: nama,
           harga,
@@ -242,7 +242,7 @@ export default function MenuManagement() {
           return;
         }
 
-        const payload: PaketCateringPayload = {
+        const payload: DataSimpanPaketCatering = {
           nama_paket: nama,
           harga_paket: harga,
           deskripsi,

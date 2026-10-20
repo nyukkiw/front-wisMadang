@@ -5,3 +5,4 @@ import ReviewAnalysis from "@/components/admin/ReviewAnalysis";
 export default function AdminReviewPage() {
   return <ReviewAnalysis />;
 }
+

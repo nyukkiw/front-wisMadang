@@ -11,10 +11,10 @@ import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import { CartBadge } from "@/components/pelanggan/CartNotification";
-import { UserRole } from "@/lib/auth";
+import { PeranPengguna } from "@/lib/auth";
 
 interface NavbarProps {
-  role: UserRole;
+  role: PeranPengguna;
   nama?: string;
   sidebarOpen: boolean;
   onMenuToggle: () => void;

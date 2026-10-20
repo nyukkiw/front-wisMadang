@@ -4,13 +4,13 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
-import { Session, UserRole } from "@/lib/auth";
+import { Sesi, PeranPengguna } from "@/lib/auth";
 import { logoutKeServer } from "@/lib/api";
 import LoginModal from "@/components/auth/LoginModal";
 
 interface AuthContextType {
-  session: Session | null;
-  login: (session: Session, ingatSaya?: boolean) => void;
+  session: Sesi | null;
+  login: (session: Sesi, ingatSaya?: boolean) => void;
   logout: () => Promise<void>;
   loginModalOpen: boolean;
   openLogin: () => void;
@@ -23,7 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const SESSION_KEY = "wis_madang_session";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<Sesi | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -35,8 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (savedSession) {
         // peran disimpan sebagai string bebas karena sesi lama bisa saja masih berisi role lama ("admin"/"kasir")
-        const parsed = JSON.parse(savedSession) as Omit<Session, "peran"> & { peran: string };
-        const migratedRole: UserRole = parsed.peran === "admin" || parsed.peran === "kasir" ? "penjual" : (parsed.peran as UserRole);
+        const parsed = JSON.parse(savedSession) as Omit<Sesi, "peran"> & { peran: string };
+        const migratedRole: PeranPengguna = parsed.peran === "admin" || parsed.peran === "kasir" ? "penjual" : (parsed.peran as PeranPengguna);
 
         setSession({ ...parsed, peran: migratedRole });
 
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  const login = (newSession: Session, ingatSaya: boolean = true) => {
+  const login = (newSession: Sesi, ingatSaya: boolean = true) => {
     setSession(newSession);
 
     // "Ingat saya" dicentang -> localStorage (tetap tersimpan walau browser ditutup).

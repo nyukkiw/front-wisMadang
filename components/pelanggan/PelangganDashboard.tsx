@@ -10,7 +10,7 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import MenuCard from "@/components/kasir/MenuCard";
 import { CartToast, notifyCustomerCartUpdated } from "@/components/pelanggan/CartNotification";
-import { CatalogItem, normalizeCatalogImage } from "@/lib/menuCatalog";
+import { ItemKatalog, rapikanGambarKatalog } from "@/lib/menuCatalog";
 import { useMenuCatalog } from "@/lib/useMenuCatalog";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { ApiError, ubahKeranjang } from "@/lib/api";
@@ -18,7 +18,7 @@ import { ApiError, ubahKeranjang } from "@/lib/api";
 export default function CustomerDashboard() {
   const [cateringPage, setCateringPage] = useState(0);
   const [cartMessage, setCartMessage] = useState("");
-  const [selectedCatering, setSelectedCatering] = useState<CatalogItem | null>(null);
+  const [selectedCatering, setSelectedCatering] = useState<ItemKatalog | null>(null);
   const { session, openLogin } = useAuth();
   const { catalog, pesanError } = useMenuCatalog();
   const [pesanErrorTampil, setPesanErrorTampil] = useState("");
@@ -42,7 +42,7 @@ export default function CustomerDashboard() {
   const cateringPackages = catalog.filter((item) => item.type === "catering");
   const visibleCatering = cateringPackages.slice(start, start + cateringPerPage);
 
-  const addToCart = async (item: CatalogItem) => {
+  const addToCart = async (item: ItemKatalog) => {
     if (!session || session.peran !== "pelanggan") {
       openLogin();
       return;
@@ -200,7 +200,7 @@ export default function CustomerDashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation" onMouseDown={() => setSelectedCatering(null)}>
           <div role="dialog" aria-modal="true" aria-labelledby="catering-detail-title" className="w-full max-w-lg overflow-hidden rounded-2xl bg-[#F4EAE1] shadow-2xl" onMouseDown={(event) => event.stopPropagation()}>
             <div className="relative h-56 bg-[#EAF2ED]">
-              <Image src={normalizeCatalogImage(selectedCatering.image)} alt={selectedCatering.name} fill sizes="(max-width: 768px) 100vw, 512px" className="object-cover" />
+              <Image src={rapikanGambarKatalog(selectedCatering.image)} alt={selectedCatering.name} fill sizes="(max-width: 768px) 100vw, 512px" className="object-cover" />
               <button type="button" onClick={() => setSelectedCatering(null)} aria-label="Tutup detail paket" className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white transition hover:bg-black/70">
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
