@@ -22,14 +22,14 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [tampilkanPassword, setTampilkanPassword] = useState(false);
 
   const [rememberMe, setRememberMe] = useState(false);
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const kirimForm = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setError("");
@@ -67,7 +67,7 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5">
+    <form onSubmit={kirimForm} className="w-full max-w-md space-y-5">
       <div>
         <label htmlFor="identifier" className="mb-2 block text-sm font-semibold text-gray-800">
           Email atau nama pengguna
@@ -92,7 +92,7 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
         <div className="relative">
           <input
             id="password"
-            type={showPassword ? "text" : "password"}
+            type={tampilkanPassword ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Masukkan password"
@@ -101,11 +101,11 @@ export default function LoginForm({ onSuccess, onRegister }: LoginFormProps) {
           />
           <button
             type="button"
-            onClick={() => setShowPassword((visible) => !visible)}
+            onClick={() => setTampilkanPassword((visible) => !visible)}
             className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-gray-800"
-            aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+            aria-label={tampilkanPassword ? "Sembunyikan password" : "Tampilkan password"}
           >
-            {showPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
+            {tampilkanPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
           </button>
         </div>
       </div>

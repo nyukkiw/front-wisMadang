@@ -16,9 +16,9 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { ApiError, ubahKeranjang } from "@/lib/api";
 
 export default function CustomerDashboard() {
-  const [cateringPage, setCateringPage] = useState(0);
-  const [cartMessage, setCartMessage] = useState("");
-  const [selectedCatering, setSelectedCatering] = useState<ItemKatalog | null>(null);
+  const [halamanCatering, setHalamanCatering] = useState(0);
+  const [pesanKeranjang, setPesanKeranjang] = useState("");
+  const [cateringTerpilih, setCateringTerpilih] = useState<ItemKatalog | null>(null);
   const { session, openLogin } = useAuth();
   const { catalog, pesanError } = useMenuCatalog();
   const [pesanErrorTampil, setPesanErrorTampil] = useState("");
@@ -37,12 +37,12 @@ export default function CustomerDashboard() {
     .slice(0, 4);
 
   const cateringPerPage = 4;
-  const start = cateringPage * cateringPerPage;
+  const start = halamanCatering * cateringPerPage;
 
   const cateringPackages = catalog.filter((item) => item.type === "catering");
   const visibleCatering = cateringPackages.slice(start, start + cateringPerPage);
 
-  const addToCart = async (item: ItemKatalog) => {
+  const tambahKeKeranjang = async (item: ItemKatalog) => {
     if (!session || session.peran !== "pelanggan") {
       openLogin();
       return;
@@ -54,20 +54,20 @@ export default function CustomerDashboard() {
     try {
       await ubahKeranjang(session.token, payload);
       notifyCustomerCartUpdated();
-      setCartMessage(`${item.name} ditambahkan ke keranjang.`);
+      setPesanKeranjang(`${item.name} ditambahkan ke keranjang.`);
     } catch (error) {
-      setCartMessage(error instanceof ApiError ? error.message : "Gagal menambahkan ke keranjang.");
+      setPesanKeranjang(error instanceof ApiError ? error.message : "Gagal menambahkan ke keranjang.");
     }
   };
 
   useEffect(() => {
-    if (!cartMessage) {
+    if (!pesanKeranjang) {
       return;
     }
 
-    const timeoutId = window.setTimeout(() => setCartMessage(""), 3200);
+    const timeoutId = window.setTimeout(() => setPesanKeranjang(""), 3200);
     return () => window.clearTimeout(timeoutId);
-  }, [cartMessage]);
+  }, [pesanKeranjang]);
 
   useEffect(() => {
     setPesanErrorTampil(pesanError);
@@ -83,19 +83,19 @@ export default function CustomerDashboard() {
   }, [pesanErrorTampil]);
 
   useEffect(() => {
-    if (!selectedCatering) {
+    if (!cateringTerpilih) {
       return;
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const tanganiTombolEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setSelectedCatering(null);
+        setCateringTerpilih(null);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedCatering]);
+    window.addEventListener("keydown", tanganiTombolEscape);
+    return () => window.removeEventListener("keydown", tanganiTombolEscape);
+  }, [cateringTerpilih]);
 
   return (
     <div className="space-y-10">
@@ -118,11 +118,11 @@ export default function CustomerDashboard() {
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {semuaMenu.map((menu) => (
-            <MenuCard key={menu.id} menu={menu} onAdd={(menu) => addToCart({ ...menu, type: "menu" })} />
+            <MenuCard key={menu.id} menu={menu} onAdd={(menu) => tambahKeKeranjang({ ...menu, type: "menu" })} />
           ))}
         </div>
 
-        <CartToast message={cartMessage} onClose={() => setCartMessage("")} />
+        <CartToast message={pesanKeranjang} onClose={() => setPesanKeranjang("")} />
       </section>
 
       <section>
@@ -130,11 +130,11 @@ export default function CustomerDashboard() {
           <h2 className="text-xl font-bold">Paket Catering</h2>
 
           <div className="flex items-center gap-2">
-            <button className="rounded-lg border border-[#e2d3c5] px-3 py-2 text-sm disabled:opacity-40" disabled={cateringPage === 0} onClick={() => setCateringPage((page) => Math.max(0, page - 1))}>
+            <button className="rounded-lg border border-[#e2d3c5] px-3 py-2 text-sm disabled:opacity-40" disabled={halamanCatering === 0} onClick={() => setHalamanCatering((page) => Math.max(0, page - 1))}>
               Sebelumnya
             </button>
 
-            <button className="rounded-lg bg-[#C08A57] px-3 py-2 text-sm text-white disabled:opacity-40" disabled={start + cateringPerPage >= cateringPackages.length} onClick={() => setCateringPage((page) => page + 1)}>
+            <button className="rounded-lg bg-[#C08A57] px-3 py-2 text-sm text-white disabled:opacity-40" disabled={start + cateringPerPage >= cateringPackages.length} onClick={() => setHalamanCatering((page) => page + 1)}>
               Berikutnya
             </button>
           </div>
@@ -147,11 +147,11 @@ export default function CustomerDashboard() {
               role="button"
               tabIndex={0}
               aria-label={`Lihat detail ${packageItem.name}`}
-              onClick={() => setSelectedCatering(packageItem)}
+              onClick={() => setCateringTerpilih(packageItem)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  setSelectedCatering(packageItem);
+                  setCateringTerpilih(packageItem);
                 }
               }}
               className="cursor-pointer rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-5 transition hover:-translate-y-0.5 hover:border-[#C08A57] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#C08A57]/60"
@@ -186,52 +186,52 @@ export default function CustomerDashboard() {
         {popularMenus.length > 0 ? (
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {popularMenus.map((menu) => (
-              <MenuCard key={menu.id} menu={menu} onAdd={(menu) => addToCart({ ...menu, type: "menu" })} />
+              <MenuCard key={menu.id} menu={menu} onAdd={(menu) => tambahKeKeranjang({ ...menu, type: "menu" })} />
             ))}
           </div>
         ) : (
           <div className="mt-4 rounded-2xl border border-dashed border-[#C08A57]/50 bg-[#F4EAE1] p-6 text-sm text-[#2C2520]/60">Belum ada menu dengan rating tinggi dari ulasan pelanggan.</div>
         )}
 
-        <CartToast message={cartMessage} onClose={() => setCartMessage("")} />
+        <CartToast message={pesanKeranjang} onClose={() => setPesanKeranjang("")} />
       </section>
 
-      {selectedCatering && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation" onMouseDown={() => setSelectedCatering(null)}>
+      {cateringTerpilih && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation" onMouseDown={() => setCateringTerpilih(null)}>
           <div role="dialog" aria-modal="true" aria-labelledby="catering-detail-title" className="w-full max-w-lg overflow-hidden rounded-2xl bg-[#F4EAE1] shadow-2xl" onMouseDown={(event) => event.stopPropagation()}>
             <div className="relative h-56 bg-[#EAF2ED]">
-              <Image src={rapikanGambarKatalog(selectedCatering.image)} alt={selectedCatering.name} fill sizes="(max-width: 768px) 100vw, 512px" className="object-cover" />
-              <button type="button" onClick={() => setSelectedCatering(null)} aria-label="Tutup detail paket" className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white transition hover:bg-black/70">
+              <Image src={rapikanGambarKatalog(cateringTerpilih.image)} alt={cateringTerpilih.name} fill sizes="(max-width: 768px) 100vw, 512px" className="object-cover" />
+              <button type="button" onClick={() => setCateringTerpilih(null)} aria-label="Tutup detail paket" className="absolute right-4 top-4 rounded-full bg-black/50 p-2 text-white transition hover:bg-black/70">
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
 
             <div className="p-6">
               <h2 id="catering-detail-title" className="text-2xl font-bold text-[#2C2520]">
-                {selectedCatering.name}
+                {cateringTerpilih.name}
               </h2>
-              <p className="mt-3 leading-6 text-[#2C2520]/70">{selectedCatering.description}</p>
+              <p className="mt-3 leading-6 text-[#2C2520]/70">{cateringTerpilih.description}</p>
 
               <div className="mt-5 grid grid-cols-2 gap-3">
                 <div className="rounded-xl bg-[#FCF9F6] p-3">
                   <p className="text-xs text-[#2C2520]/55">Harga</p>
-                  <p className="mt-1 font-bold text-[#2C2520]">Rp {selectedCatering.price.toLocaleString("id-ID")}</p>
+                  <p className="mt-1 font-bold text-[#2C2520]">Rp {cateringTerpilih.price.toLocaleString("id-ID")}</p>
                 </div>
                 <div className="rounded-xl bg-[#FCF9F6] p-3">
                   <p className="text-xs text-[#2C2520]/55">Kapasitas</p>
-                  <p className="mt-1 font-bold text-[#2C2520]">{selectedCatering.portions ?? "-"} porsi</p>
+                  <p className="mt-1 font-bold text-[#2C2520]">{cateringTerpilih.portions ?? "-"} porsi</p>
                 </div>
               </div>
 
               <div className="mt-6 flex gap-3">
-                <button type="button" onClick={() => setSelectedCatering(null)} className="flex-1 rounded-xl border border-[#e2d3c5] px-4 py-3 font-semibold text-[#2C2520] transition hover:bg-[#FCF9F6]">
+                <button type="button" onClick={() => setCateringTerpilih(null)} className="flex-1 rounded-xl border border-[#e2d3c5] px-4 py-3 font-semibold text-[#2C2520] transition hover:bg-[#FCF9F6]">
                   Kembali
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    addToCart(selectedCatering);
-                    setSelectedCatering(null);
+                    tambahKeKeranjang(cateringTerpilih);
+                    setCateringTerpilih(null);
                   }}
                   className="flex-1 rounded-xl bg-[#C08A57] px-4 py-3 font-bold text-white transition hover:bg-[#a97142]"
                 >

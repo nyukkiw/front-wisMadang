@@ -8,7 +8,7 @@ import { Sesi, PeranPengguna } from "@/lib/auth";
 import { logoutKeServer } from "@/lib/api";
 import LoginModal from "@/components/auth/LoginModal";
 
-interface AuthContextType {
+interface TipeKonteksAuth {
   session: Sesi | null;
   login: (session: Sesi, ingatSaya?: boolean) => void;
   logout: () => Promise<void>;
@@ -18,7 +18,7 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<TipeKonteksAuth | undefined>(undefined);
 
 const SESSION_KEY = "wis_madang_session";
 

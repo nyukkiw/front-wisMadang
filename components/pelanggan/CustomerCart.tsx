@@ -35,7 +35,7 @@ declare global {
   }
 }
 
-interface CustomerCartItem {
+interface ItemKeranjangPelanggan {
   id: number; // id asli menu/paket catering di backend
   name: string;
   price: number;
@@ -46,7 +46,7 @@ interface CustomerCartItem {
   portions?: number;
 }
 
-function ubahIsiKeranjangJadiCartItem(item: ApiIsiKeranjang): CustomerCartItem | null {
+function ubahIsiKeranjangJadiItemKeranjangPelanggan(item: ApiIsiKeranjang): ItemKeranjangPelanggan | null {
   if (item.menu) {
     return {
       id: item.menu.id,
@@ -77,33 +77,33 @@ function ubahIsiKeranjangJadiCartItem(item: ApiIsiKeranjang): CustomerCartItem |
 
 export default function CustomerCart() {
   const { session, openLogin } = useAuth();
-  const [items, setItems] = useState<CustomerCartItem[]>([]);
-  const [cartLoaded, setCartLoaded] = useState(false);
+  const [itemKeranjang, setItemKeranjang] = useState<ItemKeranjangPelanggan[]>([]);
+  const [keranjangDimuat, setKeranjangDimuat] = useState(false);
   const [pesanError, setPesanError] = useState("");
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [orderNumber, setOrderNumber] = useState("");
+  const [tampilkanStruk, setTampilkanStruk] = useState(false);
+  const [nomorPesanan, setNomorPesanan] = useState("");
   // Salinan isi keranjang, total, & metode pembayaran (dari hasil Midtrans) pas checkout,
   // buat ditampilkan di struk setelah keranjang aslinya dikosongkan server
-  const [itemStruk, setItemStruk] = useState<CustomerCartItem[]>([]);
-  const [totalStruk, setTotalStruk] = useState({ subtotal: 0, tax: 0, total: 0 });
+  const [itemStruk, setItemStruk] = useState<ItemKeranjangPelanggan[]>([]);
+  const [totalStruk, setTotalStruk] = useState({ subtotal: 0, pajak: 0, total: 0 });
   const [metodeStruk, setMetodeStruk] = useState("");
 
   const muatUlangKeranjang = () => {
     if (!session) {
-      setItems([]);
-      setCartLoaded(true);
+      setItemKeranjang([]);
+      setKeranjangDimuat(true);
       return;
     }
 
     ambilKeranjang(session.token)
       .then((isiKeranjang) => {
-        setItems(isiKeranjang.map(ubahIsiKeranjangJadiCartItem).filter((item): item is CustomerCartItem => item !== null));
+        setItemKeranjang(isiKeranjang.map(ubahIsiKeranjangJadiItemKeranjangPelanggan).filter((item): item is ItemKeranjangPelanggan => item !== null));
         setPesanError("");
       })
       .catch((error) => {
         setPesanError(error instanceof ApiError ? error.message : "Gagal memuat keranjang. Coba lagi nanti.");
       })
-      .finally(() => setCartLoaded(true));
+      .finally(() => setKeranjangDimuat(true));
   };
 
   useEffect(muatUlangKeranjang, [session]);
@@ -117,11 +117,11 @@ export default function CustomerCart() {
     return () => window.clearTimeout(timeoutId);
   }, [pesanError]);
 
-  const subtotal = useMemo(() => items.reduce((total, item) => total + item.price * item.quantity, 0), [items]);
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
+  const subtotal = useMemo(() => itemKeranjang.reduce((total, item) => total + item.price * item.quantity, 0), [itemKeranjang]);
+  const pajak = subtotal * 0.1;
+  const total = subtotal + pajak;
 
-  const kirimAksiKeranjang = async (item: CustomerCartItem, aksi: AksiKeranjang) => {
+  const kirimAksiKeranjang = async (item: ItemKeranjangPelanggan, aksi: AksiKeranjang) => {
     if (!session) {
       openLogin();
       return;
@@ -138,8 +138,8 @@ export default function CustomerCart() {
     }
   };
 
-  const handleCheckout = async () => {
-    if (items.length === 0) {
+  const prosesCheckout = async () => {
+    if (itemKeranjang.length === 0) {
       return;
     }
 
@@ -158,8 +158,8 @@ export default function CustomerCart() {
       const hasil = await checkoutRequest(session.token);
 
       // Simpan isi keranjang & total saat ini buat ditampilkan di struk kalau pembayaran sukses
-      const salinanItem = items;
-      const salinanTotal = { subtotal: hasil.subtotal, tax: hasil.pajak_10, total: hasil.total_akhir };
+      const salinanItem = itemKeranjang;
+      const salinanTotal = { subtotal: hasil.subtotal, pajak: hasil.pajak_10, total: hasil.total_akhir };
 
       // Langkah 2: baru dipanggil kalau popup Midtrans bilang sukses/pending - ini yang
       // beneran menyimpan pesanan ke database & mengosongkan keranjang di server.
@@ -180,8 +180,8 @@ export default function CustomerCart() {
           setItemStruk(salinanItem);
           setTotalStruk(salinanTotal);
           setMetodeStruk(hasilPembayaran.payment_type);
-          setOrderNumber(hasil.nomor_pesanan);
-          setShowReceipt(true);
+          setNomorPesanan(hasil.nomor_pesanan);
+          setTampilkanStruk(true);
         },
         onPending: (hasilPembayaran) => {
           konfirmasiKeServer(hasilPembayaran.payment_type, "menunggu_pembayaran");
@@ -199,9 +199,9 @@ export default function CustomerCart() {
     }
   };
 
-  const handleNewOrder = () => {
-    setShowReceipt(false);
-    setOrderNumber("");
+  const mulaiPesananBaru = () => {
+    setTampilkanStruk(false);
+    setNomorPesanan("");
   };
 
   return (
@@ -215,7 +215,7 @@ export default function CustomerCart() {
 
       {pesanError && <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">{pesanError}</div>}
 
-      {!cartLoaded ? null : items.length === 0 ? (
+      {!keranjangDimuat ? null : itemKeranjang.length === 0 ? (
         <div className="rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-10 text-center">
           <ShoppingCart className="mx-auto h-10 w-10 text-[#C08A57]" aria-hidden="true" />
           <h2 className="mt-3 font-bold text-[#2C2520]">Keranjang masih kosong</h2>
@@ -224,7 +224,7 @@ export default function CustomerCart() {
       ) : (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <div className="space-y-3">
-            {items.map((item) => (
+            {itemKeranjang.map((item) => (
               <article key={`${item.type}-${item.id}`} className="flex gap-4 rounded-2xl border border-[#e2d3c5] bg-[#F4EAE1] p-4 shadow-sm">
                 <Image src={item.image} alt={item.name} width={88} height={88} unoptimized={item.image.startsWith("data:")} className="h-22 w-22 rounded-xl object-cover" />
 
@@ -268,7 +268,7 @@ export default function CustomerCart() {
               </div>
               <div className="flex justify-between">
                 <span>Pajak 10%</span>
-                <span>Rp {tax.toLocaleString("id-ID")}</span>
+                <span>Rp {pajak.toLocaleString("id-ID")}</span>
               </div>
               <div className="flex justify-between text-base font-bold text-[#2C2520]">
                 <span>Total</span>
@@ -276,22 +276,22 @@ export default function CustomerCart() {
               </div>
             </div>
 
-            <button type="button" onClick={handleCheckout} className="mt-5 w-full rounded-xl bg-[#C08A57] py-3 font-bold text-white transition hover:bg-[#a97142]">
+            <button type="button" onClick={prosesCheckout} className="mt-5 w-full rounded-xl bg-[#C08A57] py-3 font-bold text-white transition hover:bg-[#a97142]">
               Bayar Sekarang
             </button>
           </aside>
         </div>
       )}
 
-      {showReceipt && (
+      {tampilkanStruk && (
         <ReceiptModal
-          orderNumber={orderNumber}
+          orderNumber={nomorPesanan}
           items={itemStruk.map((item) => ({ ...item, qty: item.quantity }))}
           subtotal={totalStruk.subtotal}
-          tax={totalStruk.tax}
+          tax={totalStruk.pajak}
           total={totalStruk.total}
           paymentMethod={metodeStruk}
-          onClose={handleNewOrder}
+          onClose={mulaiPesananBaru}
         />
       )}
     </section>

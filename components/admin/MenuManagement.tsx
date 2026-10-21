@@ -44,7 +44,7 @@ interface ItemTampilan {
   gambarUrl?: string | null;
 }
 
-interface FormState {
+interface DataForm {
   jenis: JenisItem;
   nama: string;
   deskripsi: string;
@@ -53,7 +53,7 @@ interface FormState {
   porsi: string;
 }
 
-const formKosong: FormState = {
+const formKosong: DataForm = {
   jenis: "menu",
   nama: "",
   deskripsi: "",
@@ -100,7 +100,7 @@ export default function MenuManagement() {
   const [pencarian, setPencarian] = useState("");
   const [filterJenis, setFilterJenis] = useState<"semua" | JenisItem>("semua");
 
-  const [form, setForm] = useState<FormState>(formKosong);
+  const [form, setForm] = useState<DataForm>(formKosong);
   const [sedangEdit, setSedangEdit] = useState<{ jenis: JenisItem; id: number } | null>(null);
   const [formTerbuka, setFormTerbuka] = useState(false);
   const [pesanFormError, setPesanFormError] = useState("");

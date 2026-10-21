@@ -5,7 +5,7 @@
 import Image from "next/image";
 import { CheckCircle2 } from "lucide-react";
 
-interface ReceiptItem {
+interface ItemStruk {
   name: string;
   price: number;
   qty: number;
@@ -16,7 +16,7 @@ interface ReceiptItem {
 
 interface ReceiptModalProps {
   orderNumber: string;
-  items: ReceiptItem[];
+  items: ItemStruk[];
   subtotal: number;
   tax: number;
   total: number;

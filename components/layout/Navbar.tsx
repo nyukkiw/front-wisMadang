@@ -23,9 +23,9 @@ interface NavbarProps {
 export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuToggle }: NavbarProps) {
   const router = useRouter();
   const { session, logout } = useAuth();
-  const [showProfile, setShowProfile] = useState(false);
+  const [tampilkanProfil, setTampilkanProfil] = useState(false);
 
-  const handleLogout = async () => {
+  const prosesLogout = async () => {
     await logout();
     router.replace("/login"); // Redirect ke halaman login setelah logout
   };
@@ -82,7 +82,7 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
         {/* PENJUAL */}
         {role === "penjual" && (
           <div className="relative">
-            <button onClick={() => setShowProfile(!showProfile)} className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-[#C08A57]">
+            <button onClick={() => setTampilkanProfil(!tampilkanProfil)} className="flex items-center gap-3 rounded-xl px-3 py-2 hover:bg-[#C08A57]">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F4EAE1] text-[#2C2520]">
                 <UserCircle className="h-5 w-5" aria-hidden="true" />
               </div>
@@ -97,9 +97,9 @@ export default function Navbar({ role, nama = "Pengguna", sidebarOpen, onMenuTog
             </button>
 
             {/* DROPDOWN */}
-            {showProfile && (
+            {tampilkanProfil && (
               <div className="absolute right-0 mt-2 w-48 rounded-xl bg-[#F4EAE1] p-2 text-[#2C2520] shadow-xl">
-                <button onClick={handleLogout} className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">
+                <button onClick={prosesLogout} className="w-full rounded-lg px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50">
                   Logout
                 </button>
               </div>

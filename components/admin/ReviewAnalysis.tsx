@@ -6,12 +6,12 @@ import { useEffect, useMemo, useState } from "react";
 import { MessageCircle, Sparkles, Star } from "lucide-react";
 
 import { useAuth } from "@/components/auth/AuthProvider";
-import { ApiError, ApiUlasanLengkap, InsightAi, ambilInsightAi, ambilSemuaUlasan } from "@/lib/api";
+import { ApiError, ApiUlasanLengkap, WawasanAi, ambilWawasanAi, ambilSemuaUlasan } from "@/lib/api";
 
-type Sentiment = "Positif" | "Netral" | "Perlu perhatian";
+type Sentimen = "Positif" | "Netral" | "Perlu perhatian";
 
 // sentimen_ai diisi AI ("positif"/"netral"/"negatif"). Kalau kosong (AI gagal/komentar kosong), pakai rating sebagai cadangan.
-function ambilSentimen(ulasan: ApiUlasanLengkap): Sentiment {
+function ambilSentimen(ulasan: ApiUlasanLengkap): Sentimen {
   if (ulasan.sentimen_ai === "positif") return "Positif";
   if (ulasan.sentimen_ai === "netral") return "Netral";
   if (ulasan.sentimen_ai === "negatif") return "Perlu perhatian";
@@ -25,7 +25,7 @@ function namaItemDariUlasan(ulasan: ApiUlasanLengkap) {
   return ulasan.menu?.nama_menu ?? ulasan.paket_catering?.nama_paket ?? "Item";
 }
 
-interface MenuReviewSummary {
+interface RingkasanUlasanMenu {
   name: string;
   reviewCount: number;
   averageRating: number;
@@ -41,8 +41,8 @@ export default function ReviewAnalysis() {
   const { session } = useAuth();
   const [reviews, setReviews] = useState<ApiUlasanLengkap[]>([]);
   const [pesanError, setPesanError] = useState("");
-  const [filter, setFilter] = useState<"Semua" | Sentiment>("Semua");
-  const [insight, setInsight] = useState<InsightAi | null>(null);
+  const [filter, setFilter] = useState<"Semua" | Sentimen>("Semua");
+  const [insight, setInsight] = useState<WawasanAi | null>(null);
   const [sedangMuatInsight, setSedangMuatInsight] = useState(true);
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function ReviewAnalysis() {
       .catch((error) => setPesanError(error instanceof ApiError ? error.message : "Gagal memuat data ulasan."));
 
     setSedangMuatInsight(true);
-    ambilInsightAi(session.token)
+    ambilWawasanAi(session.token)
       .then(setInsight)
       .catch(() => setInsight(null))
       .finally(() => setSedangMuatInsight(false));
@@ -94,7 +94,7 @@ export default function ReviewAnalysis() {
     });
 
     return Array.from(menuReviews.values())
-      .map(({ name, reviews: itemReviews }): MenuReviewSummary => {
+      .map(({ name, reviews: itemReviews }): RingkasanUlasanMenu => {
         const positiveCount = itemReviews.filter((review) => review.rating >= 3).length;
         const poorCount = itemReviews.filter((review) => review.rating <= 2).length;
         const averageRating = itemReviews.reduce((total, review) => total + review.rating, 0) / itemReviews.length;
@@ -206,7 +206,7 @@ export default function ReviewAnalysis() {
             </div>
             <select
               value={filter}
-              onChange={(event) => setFilter(event.target.value as "Semua" | Sentiment)}
+              onChange={(event) => setFilter(event.target.value as "Semua" | Sentimen)}
               className="rounded-lg border border-[#e2d3c5] bg-[#FCF9F6] px-3 py-2 text-sm text-[#2C2520] outline-none focus:ring-2 focus:ring-[#C08A57]/40"
             >
               <option>Semua</option>

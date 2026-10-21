@@ -7,7 +7,7 @@ import { Plus, Star } from "lucide-react";
 
 import { rapikanGambarKatalog } from "@/lib/menuCatalog";
 
-export interface MenuItem {
+export interface ItemMenu {
   // Interface untuk menu item
   id: number;
   name: string;
@@ -22,8 +22,8 @@ export interface MenuItem {
 
 interface MenuCardProps {
   // Interface untuk props MenuCard
-  menu: MenuItem;
-  onAdd: (menu: MenuItem) => void;
+  menu: ItemMenu;
+  onAdd: (menu: ItemMenu) => void;
 }
 
 export default function MenuCard({ menu, onAdd }: MenuCardProps) {

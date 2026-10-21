@@ -1,13 +1,13 @@
 "use client";
 import Image from "next/image";
-import type { MenuItem } from "@/components/kasir/MenuCard";
+import type { ItemMenu } from "@/components/kasir/MenuCard";
 
-export interface CartItem extends MenuItem {
+export interface ItemKeranjang extends ItemMenu {
   qty: number;
 }
 
 interface CartPanelProps {
-  cart: CartItem[];
+  cart: ItemKeranjang[];
   onIncrease: (id: number) => void;
   onDecrease: (id: number) => void;
   onRemove: (id: number) => void;

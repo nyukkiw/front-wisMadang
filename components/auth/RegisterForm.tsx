@@ -16,12 +16,12 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
+  const [tampilkanPassword, setTampilkanPassword] = useState(false);
+  const [tampilkanKonfirmasiPassword, setTampilkanKonfirmasiPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const kirimForm = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
@@ -82,7 +82,7 @@ export default function RegisterForm() {
           <p className="mt-2 text-sm text-gray-500">Daftar untuk menyimpan aktivitas pesanan Anda.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={kirimForm} className="space-y-5">
           <div>
             <label htmlFor="register-name" className="mb-2 block text-sm font-semibold text-gray-800">Nama lengkap</label>
             <input id="register-name" type="text" value={name} onChange={(event) => setName(event.target.value)} placeholder="Masukkan nama lengkap" required className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:ring-2 focus:ring-teal-700" />
@@ -96,9 +96,9 @@ export default function RegisterForm() {
           <div>
             <label htmlFor="register-password" className="mb-2 block text-sm font-semibold text-gray-800">Password</label>
             <div className="relative">
-              <input id="register-password" type={showPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Minimal 6 karakter" required className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 text-gray-900 outline-none focus:ring-2 focus:ring-teal-700" />
-              <button type="button" onClick={() => setShowPassword((visible) => !visible)} className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-gray-800" aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}>
-                {showPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
+              <input id="register-password" type={tampilkanPassword ? "text" : "password"} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Minimal 6 karakter" required className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 text-gray-900 outline-none focus:ring-2 focus:ring-teal-700" />
+              <button type="button" onClick={() => setTampilkanPassword((visible) => !visible)} className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-gray-800" aria-label={tampilkanPassword ? "Sembunyikan password" : "Tampilkan password"}>
+                {tampilkanPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
               </button>
             </div>
           </div>
@@ -106,9 +106,9 @@ export default function RegisterForm() {
           <div>
             <label htmlFor="register-password-confirmation" className="mb-2 block text-sm font-semibold text-gray-800">Konfirmasi password</label>
             <div className="relative">
-              <input id="register-password-confirmation" type={showPasswordConfirmation ? "text" : "password"} value={passwordConfirmation} onChange={(event) => setPasswordConfirmation(event.target.value)} placeholder="Ulangi password" required className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 text-gray-900 outline-none focus:ring-2 focus:ring-teal-700" />
-              <button type="button" onClick={() => setShowPasswordConfirmation((visible) => !visible)} className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-gray-800" aria-label={showPasswordConfirmation ? "Sembunyikan konfirmasi password" : "Tampilkan konfirmasi password"}>
-                {showPasswordConfirmation ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
+              <input id="register-password-confirmation" type={tampilkanKonfirmasiPassword ? "text" : "password"} value={passwordConfirmation} onChange={(event) => setPasswordConfirmation(event.target.value)} placeholder="Ulangi password" required className="w-full rounded-xl border border-gray-300 px-4 py-3 pr-12 text-gray-900 outline-none focus:ring-2 focus:ring-teal-700" />
+              <button type="button" onClick={() => setTampilkanKonfirmasiPassword((visible) => !visible)} className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-gray-500 hover:text-gray-800" aria-label={tampilkanKonfirmasiPassword ? "Sembunyikan konfirmasi password" : "Tampilkan konfirmasi password"}>
+                {tampilkanKonfirmasiPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}
               </button>
             </div>
           </div>

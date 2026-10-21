@@ -1,6 +1,5 @@
 // File untuk mengelola katalog menu dan paket katering, termasuk tipe data dan fungsi utilitas
 
-export const MENU_CATALOG_KEY = "wis-madang-menu-catalog";
 export const FALLBACK_IMAGE = "/IMG Wis Madang/Nasi Goreng.jpg";
 
 export type JenisItemKatalog = "menu" | "catering";
@@ -36,8 +35,4 @@ export function rapikanGambarKatalog(src: unknown) {
   } catch {
     return FALLBACK_IMAGE;
   }
-}
-
-export function getNextCatalogId(items: ItemKatalog[]) {
-  return Math.max(0, ...items.map((item) => item.id)) + 1;
 }

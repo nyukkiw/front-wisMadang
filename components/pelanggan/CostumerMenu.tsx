@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import MenuCard, { MenuItem } from "@/components/kasir/MenuCard";
+import MenuCard, { ItemMenu } from "@/components/kasir/MenuCard";
 import MenuFilter from "@/components/kasir/MenuFilter";
 import SearchMenu from "@/components/kasir/SearchMenu";
 import { dummyCategories } from "@/data/dummyData";
@@ -33,7 +33,7 @@ export default function CostumerMenu() {
 		});
 	}, [menuItems, search, selectedCategory]);
 
-	const addToCart = async (menu: MenuItem) => {
+	const addToCart = async (menu: ItemMenu) => {
 		if (!session || session.peran !== "pelanggan") {
 			openLogin();
 			return;

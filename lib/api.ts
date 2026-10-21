@@ -69,7 +69,7 @@ export async function loginRequest(identifier: string, kataSandi: string) {
   const trimmedIdentifier = identifier.trim();
   const isEmail = trimmedIdentifier.includes("@");
 
-  const response = await fetch(`${API_BASE_URL}/api/login`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/masuk`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({
@@ -84,7 +84,7 @@ export async function loginRequest(identifier: string, kataSandi: string) {
 
 
 export async function registerRequest(payload: DataPendaftaran) {
-  const response = await fetch(`${API_BASE_URL}/api/register`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/daftar`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify(payload),
@@ -94,7 +94,7 @@ export async function registerRequest(payload: DataPendaftaran) {
 }
 
 export async function logoutKeServer(token: string) {
-  const response = await fetch(`${API_BASE_URL}/api/logout`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/keluar`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
   });
@@ -108,7 +108,7 @@ export interface ApiKategori {
 }
 
 export async function ambilDaftarKategori() {
-  const response = await fetch(`${API_BASE_URL}/api/kategori`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/kategori`, {
     headers: { Accept: "application/json" },
   });
 
@@ -133,7 +133,7 @@ export interface ApiMenu {
 }
 
 export async function ambilDaftarMenu() {
-  const response = await fetch(`${API_BASE_URL}/api/menu`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/menu`, {
     headers: { Accept: "application/json" },
   });
 
@@ -154,7 +154,7 @@ export interface ApiPaketCatering {
 }
 
 export async function ambilDaftarPaketCatering() {
-  const response = await fetch(`${API_BASE_URL}/api/paket-catering`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/paket-catering`, {
     headers: { Accept: "application/json" },
   });
 
@@ -170,7 +170,7 @@ export interface DataSimpanMenu {
 }
 
 export async function buatMenu(token: string, payload: DataSimpanMenu) {
-  const response = await fetch(`${API_BASE_URL}/api/menu`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/menu`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
@@ -180,7 +180,7 @@ export async function buatMenu(token: string, payload: DataSimpanMenu) {
 }
 
 export async function ubahMenu(token: string, id: number, payload: DataSimpanMenu) {
-  const response = await fetch(`${API_BASE_URL}/api/menu/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/menu/${id}`, {
     method: "PUT",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
@@ -190,7 +190,7 @@ export async function ubahMenu(token: string, id: number, payload: DataSimpanMen
 }
 
 export async function hapusMenu(token: string, id: number) {
-  const response = await fetch(`${API_BASE_URL}/api/menu/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/menu/${id}`, {
     method: "DELETE",
     headers: susunHeaderPakaiToken(token),
   });
@@ -207,7 +207,7 @@ export interface DataSimpanPaketCatering {
 }
 
 export async function buatPaketCatering(token: string, payload: DataSimpanPaketCatering) {
-  const response = await fetch(`${API_BASE_URL}/api/paket-catering`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/paket-catering`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
@@ -217,7 +217,7 @@ export async function buatPaketCatering(token: string, payload: DataSimpanPaketC
 }
 
 export async function ubahPaketCatering(token: string, id: number, payload: DataSimpanPaketCatering) {
-  const response = await fetch(`${API_BASE_URL}/api/paket-catering/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/paket-catering/${id}`, {
     method: "PUT",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
@@ -227,7 +227,7 @@ export async function ubahPaketCatering(token: string, id: number, payload: Data
 }
 
 export async function hapusPaketCatering(token: string, id: number) {
-  const response = await fetch(`${API_BASE_URL}/api/paket-catering/${id}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/paket-catering/${id}`, {
     method: "DELETE",
     headers: susunHeaderPakaiToken(token),
   });
@@ -248,7 +248,7 @@ export async function uploadGambarMenu(token: string, id: number, file: File) {
   const formData = new FormData();
   formData.append("gambar", file);
 
-  const response = await fetch(`${API_BASE_URL}/api/menu/${id}/gambar`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/menu/${id}/gambar`, {
     method: "POST",
     headers: susunHeaderUploadFile(token),
     body: formData,
@@ -261,7 +261,7 @@ export async function uploadGambarPaketCatering(token: string, id: number, file:
   const formData = new FormData();
   formData.append("gambar", file);
 
-  const response = await fetch(`${API_BASE_URL}/api/paket-catering/${id}/gambar`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/paket-catering/${id}/gambar`, {
     method: "POST",
     headers: susunHeaderUploadFile(token),
     body: formData,
@@ -282,7 +282,7 @@ export interface ApiIsiKeranjang {
 
 interface ResponsKeranjang {
   success: boolean;
-  message: string;
+  pesan: string;
   data:
     | []
     | {
@@ -314,12 +314,12 @@ export interface DataUbahKeranjang {
 
 interface ResponsUbahKeranjang {
   success: boolean;
-  message: string;
+  pesan: string;
   data?: ApiIsiKeranjang;
 }
 
 export async function ubahKeranjang(token: string, payload: DataUbahKeranjang) {
-  const response = await fetch(`${API_BASE_URL}/api/v1/keranjang/simpan`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/keranjang`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify(payload),
@@ -338,14 +338,14 @@ export interface HasilCheckout {
 
 interface ResponsCheckout {
   success: boolean;
-  message: string;
+  pesan: string;
   data: HasilCheckout;
 }
 
 // Langkah 1: cuma hitung total & minta Snap Token, belum menyimpan pesanan apapun.
 // Metode pembayaran belum ditentukan di sini - baru dipilih pengguna di dalam popup Midtrans.
 export async function checkoutRequest(token: string) {
-  const response = await fetch(`${API_BASE_URL}/api/v1/pesanan/checkout`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/pembayaran/checkout`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
   });
@@ -359,13 +359,13 @@ export type StatusKonfirmasiPembayaran = "diproses" | "menunggu_pembayaran";
 
 // Langkah 2: baru dipanggil setelah popup Midtrans bilang sukses/pending. Ini yang beneran menyimpan pesanan & mengosongkan keranjang.
 export async function konfirmasiPembayaranRequest(token: string, nomorPesanan: string, metodePembayaran: string, status: StatusKonfirmasiPembayaran) {
-  const response = await fetch(`${API_BASE_URL}/api/v1/pesanan/konfirmasi`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/pembayaran/konfirmasi`, {
     method: "POST",
     headers: susunHeaderPakaiToken(token),
     body: JSON.stringify({ nomor_pesanan: nomorPesanan, metode_pembayaran: metodePembayaran, status }),
   });
 
-  return olahRespons<{ success: boolean; message: string }>(response);
+  return olahRespons<{ success: boolean; pesan: string }>(response);
 }
 
 export interface ApiDetailPesanan {
@@ -403,7 +403,7 @@ export interface ApiPesanan {
 }
 
 export async function ambilRiwayatPesanan(token: string) {
-  const response = await fetch(`${API_BASE_URL}/api/v1/pesanan`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/pesanan-saya`, {
     headers: susunHeaderPakaiToken(token),
   });
 
@@ -433,7 +433,7 @@ export async function ambilSemuaUlasan(token: string) {
   return hasil.data;
 }
 
-export interface InsightAi {
+export interface WawasanAi {
   topik_utama: string;
   ringkasan: string;
   sinyal_utama: string;
@@ -442,12 +442,12 @@ export interface InsightAi {
 
 // Khusus penjual (admin): minta AI bikin ringkasan, sinyal utama, & saran aksi dari semua ulasan sekaligus.
 // Balikin null kalau belum cukup data / AI-nya gagal (bukan error, biar frontend bisa tampilin pesan yang sesuai).
-export async function ambilInsightAi(token: string) {
+export async function ambilWawasanAi(token: string) {
   const response = await fetch(`${API_BASE_URL}/api/v1/ulasan/insight`, {
     headers: susunHeaderPakaiToken(token),
   });
 
-  const hasil = await olahRespons<{ success: boolean; message?: string; data?: InsightAi }>(response);
+  const hasil = await olahRespons<{ success: boolean; message?: string; data?: WawasanAi }>(response);
 
   return hasil.success ? (hasil.data ?? null) : null;
 }
@@ -480,5 +480,5 @@ export async function kirimUlasanRequest(token: string, pesananId: string, ulasa
     body: JSON.stringify({ pesanan_id: pesananId, ulasan }),
   });
 
-  return olahRespons<{ success: boolean; message: string }>(response);
+  return olahRespons<{ success: boolean; pesan: string }>(response);
 }
